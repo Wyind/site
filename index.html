@@ -643,9 +643,11 @@
       animation: bob 5.5s ease-in-out infinite;
     }
 
-    .sea-mark svg {
-      width: 30px;
-      height: 30px;
+    .sea-mark svg,
+    .sea-mark img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
     }
 
     .sea-text h3 {
@@ -1503,7 +1505,7 @@
       </div>
 
       <h1 class="name" id="hero-name">wyind</h1>
-      <p class="tagline" id="hero-tag">Linux tinkerer building compositors, browsers, and low-level software.</p>
+      <p class="tagline" id="hero-tag">Linux tinkerer who sometimes builds software.</p>
       <div class="scroll-cue mono" id="hero-cue"
         onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
         <span>descend</span>
@@ -1549,10 +1551,10 @@
         <h2 class="section-title">Building below the surface</h2>
       </div>
       <div class="about-body">
-        <p>I'm <strong>wyind</strong>, a developer focused on low-level systems. I build compositors, browser engines,
-          and core software from scratch.</p>
-        <p>Most of my projects start with simple curiosity about how things work under the hood. I enjoy taking complex
-          systems apart and rebuilding them to see how far they can go.</p>
+        <p>I'm <strong>wyind</strong>, a developer building things i like to call software. </p>
+        <p>I like building software and tinkering with linux, browsers, and other systems. I'm curious how software
+          works
+          under the hood and enjoy building things from scratch.</p>
       </div>
     </div>
   </section>
@@ -1562,19 +1564,14 @@
       <div>
         <div class="sea-panel">
           <div class="sea-mark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M2 8c4-4 8-4 12 0s8 4 8 0" />
-              <path d="M2 12c4-4 8-4 12 0s8 4 8 0" />
-              <path d="M2 16c4-4 8-4 12 0s8 4 8 0" />
-            </svg>
+            <img src="abyss_software_logo_transparent_arrow.svg" alt="Abyss Software Logo" />
           </div>
           <div class="sea-text">
-            <h3>Sea Software</h3>
+            <h3>Abyss Software</h3>
             <p>The home for my browser and systems projects. Everything here is built from the ground up to understand
               how core software works.</p>
-            <a class="sea-link mono" href="https://github.com/seasoftware-dev" target="_blank" rel="noopener">
-              github/seasoftware-dev
+            <a class="sea-link mono" href="https://github.com/abysssoftware-dev" target="_blank" rel="noopener">
+              github/abysssoftware-dev
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                 stroke-linejoin="round">
                 <path d="M7 17L17 7" />
@@ -1599,16 +1596,12 @@
           <div class="card-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
               stroke-linejoin="round">
-              <path d="M2 8c4-4 8-4 12 0s8 4 8 0" />
-              <path d="M2 12c4-4 8-4 12 0s8 4 8 0" />
-              <path d="M2 16c4-4 8-4 12 0s8 4 8 0" />
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
             </svg>
           </div>
-          <h3>Tsunami</h3>
-          <p>A lightweight, privacy-focused browser that uses native system web engines for fast performance and low RAM
-            usage.</p>
-          <p class="note">Currently undergoing a complete rewrite.</p>
-          <a class="card-link mono" href="https://github.com/seasoftware-dev/tsunami/" target="_blank" rel="noopener">
+          <h3>Umbra Browser</h3>
+          <p>A fast, modern, and privacy-focused web browser.</p>
+          <a class="card-link mono" href="https://umbra-browser.org" target="_blank" rel="noopener">
             View project
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
