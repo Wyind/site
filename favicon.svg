@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="waveFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8ff5ff"/>
+      <stop offset="100%" stop-color="#123b70"/>
+    </linearGradient>
+  </defs>
+  <path d="M 0 16 C 6 10, 12 24, 18 14 C 24 6, 28 10, 32 8 L 32 32 L 0 32 Z" fill="url(#waveFill)"/>
+</svg>
