@@ -1,4 +1,4 @@
-/* wyind-settings: tiny settings store + pixel settings console */
+
 (function () {
   'use strict';
 
@@ -119,7 +119,7 @@
     if (!opts || !opts.silent) flashSaved();
   }
 
-  /* ---------------- settings console UI ---------------- */
+  
 
   var PANELS = [
     {

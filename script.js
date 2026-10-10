@@ -469,7 +469,7 @@ if (playerPlayBtn) playerPlayBtn.textContent = 'PLAY';
     }
   });
 
-  /* ---- settings bridge: apply runtime-only settings owned by this file ---- */
+  
   function applyRuntimeSetting(key, value) {
     switch (key) {
       case 'theme':

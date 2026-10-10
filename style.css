@@ -1,4 +1,4 @@
-/* Blue 8-bit layer: palette pulled from Blue Loop Witch + Midnight Cyberpunk Cat */
+
 [data-theme="dark"]{--bg:#081327;--bg-alt:#0d1d3b;--bg-card:#0f2147;--border:#4da8ff;--border-dim:#203e6a;--border-dashed:#35689d;--text:#dbe8ff;--text-dim:#9db8e0;--text-muted:#6f8fbf;--trackpoint:#4da8ff;--trackpoint-glow:rgba(77,168,255,.4);--ibm-red:#bcd4f5;--ibm-green:#5ce1ff;--ibm-blue:#4da8ff;--led-green:#5ce1ff;--led-amber:#bcd4f5;--grid-dot:rgba(77,168,255,.09);--code-bg:#0a1833;--pxs:#1b355f;--shadow:4px 4px 0 #020816;--shadow-hover:6px 6px 0 #020816;--shadow-sm:2px 2px 0 #020816}
 [data-theme="light"]{--bg:#d6e6ff;--bg-alt:#c2d8f7;--bg-card:#eaf3ff;--border:#14274c;--border-dim:#90b0dc;--border-dashed:#6d92c8;--text:#081327;--text-dim:#2d4a7a;--text-muted:#4a6ca2;--trackpoint:#1a6fe0;--trackpoint-glow:rgba(26,111,224,.4);--ibm-red:#14274c;--ibm-green:#0a8fb0;--ibm-blue:#1a6fe0;--led-green:#0a8fb0;--led-amber:#35689d;--grid-dot:rgba(20,39,76,.1);--code-bg:#cfe1fa;--pxs:#8fb4e8;--shadow:4px 4px 0 #14274c;--shadow-hover:6px 6px 0 #14274c;--shadow-sm:2px 2px 0 #14274c}
 html{font-size:17px}
@@ -52,7 +52,7 @@ nav{padding:8px 14px;gap:8px}
 .nav-links a{font-size:.9rem;padding:2px 5px}
 .brand-prompt,.thinklight-btn{font-size:.9rem}
 .status-leds{font-size:1.2rem}
-/* ---- more 8/16-bit ---- */
+
 [data-theme="dark"],[data-theme="light"]{--shadow:0 -3px 0 var(--border),0 3px 0 var(--border),-3px 0 0 var(--border),3px 0 0 var(--border),7px 10px 0 var(--sh);--shadow-hover:0 -3px 0 var(--trackpoint),0 3px 0 var(--trackpoint),-3px 0 0 var(--trackpoint),3px 0 0 var(--trackpoint),9px 12px 0 var(--sh);--shadow-sm:0 -2px 0 var(--border),0 2px 0 var(--border),-2px 0 0 var(--border),2px 0 0 var(--border),4px 6px 0 var(--sh)}
 [data-theme="dark"]{--sh:#020816}[data-theme="light"]{--sh:#7fa3d8}
 *{-webkit-font-smoothing:none;font-smooth:never}
@@ -72,7 +72,7 @@ html,body{cursor:var(--px-cursor-active) 2 2,auto}
 .player-bar-fill{background:repeating-linear-gradient(90deg,var(--trackpoint) 0 6px,transparent 6px 8px)}
 .player-bar-track{background:var(--bg)}
 main>section.tui-window::before{content:"";position:absolute;left:-3px;right:-3px;top:-12px;height:6px;background:repeating-linear-gradient(90deg,var(--border-dim) 0 6px,transparent 6px 12px);opacity:.7}
-/* title screen */
+
 #boot-overlay{flex-direction:column;gap:18px;font-family:'Pixelify Sans',monospace;color:#dbe8ff}
 .boot-hud{position:absolute;top:0;left:0;right:0;z-index:2;display:flex;justify-content:space-between;gap:8px;padding:14px 18px;font-size:.8rem;color:#bcd4f5;text-shadow:2px 2px 0 #020816}
 .boot-hud span:nth-child(2){color:#4da8ff}
@@ -96,7 +96,7 @@ main>section.tui-window::before{content:"";position:absolute;left:-3px;right:-3p
 .boot-footer-bar{border:0;background:transparent;font-size:.75rem;color:#6f8fbf;justify-content:space-between;padding:10px 4px 0}
 .boot-window{padding:24px 22px 16px}
 .boot-logo{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#dbe8ff;filter:none;text-shadow:3px 3px 0 #4da8ff,6px 6px 0 #1b355f;letter-spacing:.06em}
-/* ---- settings console ---- */
+
 #settings-overlay{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(5,13,31,.88);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s}
 [data-theme="light"] #settings-overlay{background:rgba(20,39,76,.6)}
 #settings-overlay.open{opacity:1;visibility:visible;pointer-events:auto}
@@ -165,7 +165,7 @@ main>section.tui-window::before{content:"";position:absolute;left:-3px;right:-3p
 .settings-kbd-list kbd{font-family:'Pixelify Sans',monospace;font-size:.66rem;border:2px solid var(--border-dim);background:var(--bg);color:var(--text);padding:1px 6px}
 @media(max-width:760px){.settings-body{grid-template-columns:1fr}.settings-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:3px solid var(--border);gap:2px}.settings-nav-head{display:none}.settings-nav-btn{white-space:nowrap}.settings-nav-btn.active{box-shadow:inset 0 -3px 0 var(--trackpoint)}.settings-meta{min-width:100%}}
 
-/* Arcade mini-games */
+
 .games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}
 .game-card{min-width:0;border:1px solid var(--border-dim);background:var(--bg-alt);padding:14px}
 .game-card h3{margin:0 0 8px;color:var(--trackpoint);font-size:1rem}
