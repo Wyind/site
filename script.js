@@ -51,7 +51,7 @@
 
   let currentIdx = 0;
   let isPlaying = false;
-  let wantsPlay = false; // remember intent across track changes / gate
+  let wantsPlay = false;
 
   const panel = document.getElementById('music-panel');
   const toggleBtn = document.getElementById('music-toggle-btn');
