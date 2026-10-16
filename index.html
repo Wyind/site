@@ -1,1555 +1,224 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
-
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>wyind</title>
-  <meta name="description" content="wyind. Linux tinkerer building browsers, TUI tools, and systems software on PC and on a ThinkPad X13." />
+  <meta name="description" content="wyind. Linux tinkerer building browsers, TUI tools, and systems software on PC other shit on a ThinkPad X13." />
   <meta property="og:title" content="wyind" />
   <meta property="og:description" content="Linux tinkerer building browsers, TUI tools, and systems software on PC and on a ThinkPad X13." />
   <meta property="og:type" content="website" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
-    rel="stylesheet">
-
-  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  <style>
-    :root {
-      --bg: #ffffff;
-      --bg-alt: #f6f7f9;
-      --bg-card: #ffffff;
-      --border: #18181b;
-      --border-dim: #d4d4d8;
-      --border-dashed: #a1a1aa;
-      --text: #09090b;
-      --text-dim: #52525b;
-      --text-muted: #71717a;
-      --trackpoint: #e01a22;
-      --trackpoint-glow: rgba(224, 26, 34, 0.35);
-      --ibm-red: #e62325;
-      --ibm-green: #00a859;
-      --ibm-blue: #0f62fe;
-      --led-green: #10b981;
-      --led-amber: #f59e0b;
-      --grid-dot: rgba(0, 0, 0, 0.08);
-      --code-bg: #eceef1;
-      --shadow: 4px 4px 0px #09090b;
-      --shadow-hover: 6px 6px 0px #09090b;
-      --shadow-sm: 2px 2px 0px #09090b;
-    }
-
-    [data-theme="dark"] {
-      --bg: #0c0d0e;
-      --bg-alt: #141517;
-      --bg-card: #18191c;
-      --border: #e4e4e7;
-      --border-dim: #3f3f46;
-      --border-dashed: #52525b;
-      --text: #fafafa;
-      --text-dim: #a1a1aa;
-      --text-muted: #71717a;
-      --grid-dot: rgba(255, 255, 255, 0.08);
-      --code-bg: #222327;
-      --shadow: 4px 4px 0px #e4e4e7;
-      --shadow-hover: 6px 6px 0px #e4e4e7;
-      --shadow-sm: 2px 2px 0px #e4e4e7;
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      font-size: 16px;
-    }
-
-    ::selection {
-      background: var(--trackpoint);
-      color: #ffffff;
-    }
-
-    body {
-      min-height: 100vh;
-      background-color: var(--bg);
-      background-image: radial-gradient(var(--grid-dot) 1.2px, transparent 1.2px);
-      background-size: 20px 20px;
-      color: var(--text);
-      font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
-      line-height: 1.6;
-      overflow-x: hidden;
-      transition: background-color 0.25s ease, color 0.25s ease;
-    }
-
-    #click-canvas {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 999;
-      pointer-events: none;
-    }
-
-    #boot-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background-color: var(--bg);
-      background-image: radial-gradient(var(--grid-dot) 1.2px, transparent 1.2px);
-      background-size: 20px 20px;
-      color: var(--text);
-      font-family: 'IBM Plex Mono', monospace;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      cursor: pointer;
-      user-select: none;
-      animation: bootOverlayFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.45s ease;
-    }
-
-    @keyframes bootOverlayFade {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    #boot-overlay.booted {
-      opacity: 0;
-      transform: scale(1.02);
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .boot-window {
-      background: var(--bg-card);
-      border: 2px solid var(--border);
-      box-shadow: var(--shadow-hover);
-      max-width: 660px;
-      width: 100%;
-      animation: bootCardPop 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
-    }
-
-    @keyframes bootCardPop {
-      0% {
-        opacity: 0;
-        transform: translateY(16px) scale(0.97);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .boot-titlebar {
-      background: var(--bg-alt);
-      border-bottom: 2px solid var(--border);
-      padding: 8px 14px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: var(--text);
-    }
-
-    .boot-titlebar .title-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .boot-content {
-      padding: clamp(20px, 4vw, 32px);
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .boot-logo {
-      font-family: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
-      font-size: clamp(1.8rem, 5vw, 2.6rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: var(--text);
-    }
-
-    .boot-sub {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      margin-top: 4px;
-      font-family: 'IBM Plex Mono', monospace;
-    }
-
-    .tp-dot {
-      color: var(--trackpoint);
-      display: inline-block;
-      animation: pulseDot 1.5s infinite;
-    }
-
-    @keyframes pulseDot {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px var(--trackpoint)); }
-      50% { transform: scale(1.25); filter: drop-shadow(0 0 8px var(--trackpoint)); }
-    }
-
-    .tp-p { color: var(--ibm-red); }
-    .tp-a { color: var(--ibm-green); }
-    .tp-d { color: var(--ibm-blue); }
-
-    .boot-lines {
-      background: var(--code-bg);
-      border: 1px solid var(--border-dim);
-      border-left: 3px solid var(--border);
-      padding: 12px 16px;
-      font-size: 0.82rem;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .boot-line {
-      opacity: 0;
-      animation: bootLineIn 0.35s ease forwards;
-    }
-
-    .boot-line:nth-child(1) { animation-delay: 0.2s; }
-    .boot-line:nth-child(2) { animation-delay: 0.3s; }
-    .boot-line:nth-child(3) { animation-delay: 0.4s; }
-    .boot-line:nth-child(4) { animation-delay: 0.5s; }
-
-    @keyframes bootLineIn {
-      0% { opacity: 0; transform: translateX(-4px); }
-      100% { opacity: 1; transform: translateX(0); }
-    }
-
-    .boot-prompt-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      opacity: 0;
-      animation: bootLineIn 0.4s ease 0.6s forwards;
-    }
-
-    .boot-prompt {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 14px 20px;
-      background: var(--bg);
-      border: 2px solid var(--border);
-      color: var(--text);
-      font-size: 0.92rem;
-      font-weight: 700;
-      box-shadow: var(--shadow);
-      border-left: 5px solid var(--trackpoint);
-      transition: all 0.15s ease;
-    }
-
-    #boot-overlay:hover .boot-prompt,
-    .boot-prompt:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: var(--shadow-hover);
-      border-color: var(--trackpoint);
-    }
-
-    .boot-prompt:active {
-      transform: translate(1px, 1px);
-      box-shadow: none;
-    }
-
-    .boot-footer-bar {
-      border-top: 1px solid var(--border-dim);
-      padding: 10px 14px;
-      font-size: 0.74rem;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      background: var(--bg-alt);
-    }
-
-    nav {
-      position: sticky;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 500;
-      background: var(--bg);
-      border-bottom: 2px solid var(--border);
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      box-shadow: 0 2px 0px rgba(0, 0, 0, 0.04);
-      transition: background-color 0.25s ease, border-color 0.25s ease;
-    }
-
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .brand-prompt {
-      font-size: 0.95rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      color: var(--text);
-      padding: 4px 10px;
-      border: 1.5px solid var(--border);
-      background: var(--bg-alt);
-      box-shadow: var(--shadow-sm);
-      transition: all 0.15s ease;
-    }
-
-    .brand-prompt:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: var(--shadow);
-      border-color: var(--trackpoint);
-    }
-
-    .brand-prompt:active {
-      transform: translate(1px, 1px);
-      box-shadow: none;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .nav-links a {
-      font-size: 0.82rem;
-      font-weight: 500;
-      text-decoration: none;
-      color: var(--text-dim);
-      padding: 4px 8px;
-      border: 1px solid transparent;
-      transition: all 0.15s ease;
-    }
-
-    .nav-links a:hover {
-      color: var(--text);
-      background: var(--bg-alt);
-      border-color: var(--border);
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .status-leds {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 3px 8px;
-      background: var(--bg-alt);
-      border: 1px solid var(--border-dim);
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--text-dim);
-    }
-
-    .led {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-
-    .led.pwr { background: var(--led-green); box-shadow: 0 0 6px var(--led-green); }
-    .led.bat { background: var(--led-green); box-shadow: 0 0 6px var(--led-green); }
-    .led.disk { background: var(--led-amber); transition: opacity 0.1s; }
-    .led.disk.active { box-shadow: 0 0 8px var(--led-amber); }
-
-    .thinklight-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--bg);
-      color: var(--text);
-      border: 1.5px solid var(--border);
-      padding: 4px 10px;
-      font-family: inherit;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.15s ease;
-    }
-
-    .thinklight-btn:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: var(--shadow);
-    }
-
-    .thinklight-btn:active {
-      transform: translate(1px, 1px);
-      box-shadow: none;
-    }
-
-    main {
-      max-width: 1040px;
-      margin: 0 auto;
-      padding: 36px 16px 120px;
-      display: flex;
-      flex-direction: column;
-      gap: 36px;
-    }
-
-    .tui-window {
-      background: var(--bg-card);
-      border: 2px solid var(--border);
-      box-shadow: var(--shadow);
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.25s, border-color 0.25s;
-      position: relative;
-    }
-
-    .tui-window:hover {
-      box-shadow: var(--shadow-hover);
-    }
-
-    .tui-titlebar {
-      background: var(--bg-alt);
-      border-bottom: 2px solid var(--border);
-      padding: 8px 14px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--text);
-      user-select: none;
-    }
-
-    .tui-titlebar .title-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tui-titlebar .badge {
-      background: var(--border);
-      color: var(--bg);
-      font-size: 0.68rem;
-      padding: 1px 6px;
-      font-weight: 700;
-    }
-
-    .tui-titlebar .controls {
-      display: flex;
-      gap: 8px;
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-
-    .tui-content {
-      padding: clamp(16px, 3vw, 28px);
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 28px;
-      align-items: start;
-    }
-
-    @media (max-width: 768px) {
-      .hero-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-    }
-
-    .avatar-frame {
-      border: 2px solid var(--border);
-      background: #ffffff;
-      padding: 8px;
-      box-shadow: var(--shadow-sm);
-      text-align: center;
-    }
-
-    .avatar-frame img {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      display: block;
-      border: 1px solid var(--border-dim);
-      background: #ffffff;
-    }
-
-    .avatar-caption {
-      margin-top: 8px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #09090b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .avatar-caption .red-nub {
-      width: 8px;
-      height: 8px;
-      background: var(--trackpoint);
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .hero-info h1.name {
-      font-family: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
-      font-size: clamp(2.4rem, 6vw, 3.8rem);
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-
-    .name-i {
-      display: inline-block;
-      position: relative;
-    }
-
-    .name-i .name-i-letter {
-      display: inline-block;
-    }
-
-    .name-i .name-i-dot {
-      position: absolute;
-      top: 0.12em;
-      left: 14.1%;
-      transform: translateX(-50%);
-      width: 0.22em;
-      height: 0.22em;
-      background: var(--trackpoint);
-      border-radius: 50%;
-      display: block;
-      animation: pulseDot 1.5s infinite;
-    }
-
-    .hero-tagline {
-      font-size: 1.05rem;
-      color: var(--text-dim);
-      margin-bottom: 18px;
-      font-weight: 400;
-    }
-
-    .terminal-box {
-      background: var(--code-bg);
-      border: 1px solid var(--border-dim);
-      border-left: 3px solid var(--border);
-      padding: 14px 16px;
-      font-size: 0.84rem;
-      line-height: 1.6;
-      margin-bottom: 20px;
-      overflow-x: auto;
-    }
-
-    .terminal-box .cmd {
-      color: var(--trackpoint);
-      font-weight: 600;
-    }
-
-    .terminal-box .output {
-      color: var(--text);
-      margin-top: 6px;
-      display: grid;
-      grid-template-columns: auto 1fr;
-      column-gap: 16px;
-      row-gap: 3px;
-    }
-
-    .terminal-box .key {
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .quick-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .badge-pill {
-      font-size: 0.76rem;
-      padding: 4px 10px;
-      background: var(--bg-alt);
-      border: 1px solid var(--border);
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .badge-pill:hover {
-      background: var(--border);
-      color: var(--bg);
-      transform: translateY(-1px);
-    }
-
-    .about-text {
-      font-size: 0.95rem;
-      color: var(--text-dim);
-      line-height: 1.8;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .about-text strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .about-text a {
-      color: var(--trackpoint);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    .specs-table {
-      margin-top: 16px;
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.82rem;
-    }
-
-    .specs-table th,
-    .specs-table td {
-      border: 1px solid var(--border-dim);
-      padding: 8px 12px;
-      text-align: left;
-    }
-
-    .specs-table th {
-      background: var(--bg-alt);
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .specs-table td {
-      color: var(--text-dim);
-    }
-
-    .studio-panel {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .studio-logo-box {
-      width: 72px;
-      height: 72px;
-      border: 2px solid var(--border);
-      background: var(--bg-alt);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .studio-logo-box img {
-      width: 44px;
-      height: 44px;
-    }
-
-    .studio-body {
-      flex: 1;
-      min-width: 260px;
-    }
-
-    .studio-body h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-
-    .studio-body p {
-      font-size: 0.9rem;
-      color: var(--text-dim);
-      line-height: 1.6;
-      margin-bottom: 12px;
-    }
-
-    .tui-link-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--trackpoint);
-      text-decoration: none;
-      border-bottom: 1.5px solid var(--trackpoint);
-      padding-bottom: 2px;
-      transition: gap 0.2s ease;
-    }
-
-    .tui-link-btn:hover {
-      gap: 10px;
-    }
-
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .project-card {
-      border: 1.5px solid var(--border);
-      background: var(--bg-card);
-      padding: 20px;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.15s ease;
-    }
-
-    .project-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow);
-      border-color: var(--trackpoint);
-    }
-
-    .project-card .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-
-    .project-card h4 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .project-type {
-      font-size: 0.68rem;
-      font-weight: 700;
-      padding: 2px 6px;
-      background: var(--bg-alt);
-      border: 1px solid var(--border-dim);
-      color: var(--text-dim);
-    }
-
-    .project-card p {
-      font-size: 0.86rem;
-      color: var(--text-dim);
-      line-height: 1.6;
-      margin-bottom: 18px;
-      flex-grow: 1;
-    }
-
-    .project-card.placeholder {
-      border-style: dashed;
-      border-color: var(--border-dashed);
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      min-height: 180px;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-
-    .contact-content {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .contact-lede {
-      font-size: 0.95rem;
-      color: var(--text-dim);
-      max-width: 680px;
-    }
-
-    .contact-links {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .contact-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.86rem;
-      font-weight: 600;
-      padding: 10px 18px;
-      background: var(--bg);
-      color: var(--text);
-      border: 2px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-
-    .contact-btn:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: var(--shadow);
-      border-color: var(--trackpoint);
-    }
-
-    .contact-btn svg {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
-    }
-
-    footer {
-      max-width: 1040px;
-      margin: 0 auto;
-      padding: 24px 16px 80px;
-      border-top: 2px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      font-size: 0.78rem;
-      color: var(--text-dim);
-    }
-
-    .footer-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    #audio-dock {
-      position: fixed;
-      bottom: 18px;
-      right: 18px;
-      z-index: 800;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-    }
-
-    #music-panel {
-      width: clamp(290px, 86vw, 360px);
-      background: var(--bg-card);
-      border: 2px solid var(--border);
-      box-shadow: var(--shadow);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transition: transform 0.2s ease, opacity 0.2s ease, visibility 0.2s;
-      transform-origin: bottom right;
-    }
-
-    #music-panel.collapsed {
-      opacity: 0;
-      transform: scale(0.9) translateY(16px);
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .player-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-dim);
-      padding-bottom: 6px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .player-track-info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .player-title {
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .player-artist {
-      font-size: 0.76rem;
-      color: var(--trackpoint);
-      font-weight: 500;
-    }
-
-    .player-progress-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .player-bar-track {
-      width: 100%;
-      height: 6px;
-      background: var(--bg-alt);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      position: relative;
-    }
-
-    .player-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--trackpoint);
-    }
-
-    .player-time-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.68rem;
-      color: var(--text-muted);
-    }
-
-    .player-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin: 4px 0;
-    }
-
-    .player-btn {
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      color: var(--text);
-      font-family: inherit;
-      padding: 4px 8px;
-      font-size: 0.78rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 1px 1px 0px var(--border);
-      transition: all 0.1s ease;
-    }
-
-    .player-btn:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 2px 2px 0px var(--border);
-    }
-
-    .player-btn:active {
-      transform: translate(1px, 1px);
-      box-shadow: none;
-    }
-
-    .player-btn.play-main {
-      padding: 6px 14px;
-      font-weight: 700;
-      background: var(--trackpoint);
-      color: #ffffff;
-      border-color: var(--border);
-    }
-
-    .player-btn.active {
-      background: var(--border);
-      color: var(--bg);
-    }
-
-    .player-volume-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.72rem;
-      color: var(--text-dim);
-    }
-
-    .player-vol-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 4px;
-      background: var(--bg-alt);
-      border: 1px solid var(--border-dim);
-      outline: none;
-      cursor: pointer;
-    }
-
-    .player-vol-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 10px;
-      height: 10px;
-      background: var(--trackpoint);
-      border: 1px solid var(--border);
-      cursor: pointer;
-    }
-
-    .player-playlist {
-      max-height: 130px;
-      overflow-y: auto;
-      border-top: 1px solid var(--border-dim);
-      padding-top: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .player-playlist::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .player-playlist::-webkit-scrollbar-thumb {
-      background: var(--border-dim);
-    }
-
-    .playlist-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 6px;
-      font-size: 0.74rem;
-      cursor: pointer;
-      border: 1px solid transparent;
-      color: var(--text-dim);
-    }
-
-    .playlist-item:hover {
-      background: var(--bg-alt);
-      color: var(--text);
-    }
-
-    .playlist-item.active {
-      background: var(--bg-alt);
-      border-color: var(--border);
-      color: var(--trackpoint);
-      font-weight: 700;
-    }
-
-    .audio-dock-buttons {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .dock-pill {
-      background: var(--bg-card);
-      border: 2px solid var(--border);
-      color: var(--text);
-      font-family: inherit;
-      padding: 6px 14px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s ease;
-    }
-
-    .dock-pill:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: var(--shadow);
-    }
-
-    .dock-pill .trackpoint-nub {
-      width: 10px;
-      height: 10px;
-      background: var(--trackpoint);
-      border-radius: 50%;
-      display: inline-block;
-      flex-shrink: 0;
-    }
-
-    .dock-pill.playing .trackpoint-nub {
-      animation: pulseDot 1s infinite;
-    }
-
-    #thinklight-beam {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0;
-      background: radial-gradient(circle at 85% 0%, rgba(255, 245, 180, 0.18) 0%, transparent 60%);
-      transition: opacity 0.4s ease;
-    }
-
-    body.thinklight-illuminated #thinklight-beam {
-      opacity: 1;
-    }
-
-    #flashbang-overlay {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #ffffff;
-      z-index: 99999;
-      pointer-events: none;
-      opacity: 0;
-    }
-
-    #flashbang-overlay.flashing {
-      animation: csFlashbang 4.5s ease-out forwards;
-    }
-
-    @keyframes csFlashbang {
-      0% {
-        opacity: 1;
-      }
-      35% {
-        opacity: 1;
-      }
-      70% {
-        opacity: 0.6;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
-  </style>
+  <meta property="og:image" content="avatar.jpg" />
+  <link rel="icon" href="avatar.jpg" />
   <link rel="stylesheet" href="style.css" />
+  <noscript>
+    <style>
+      /* No JS: skip the entrance gate so the page stays reachable. */
+      .gate { display: none !important; }
+      body.gate-open { overflow: auto !important; }
+    </style>
+  </noscript>
+  <script>
+    // Apply theme + js flag before first paint to avoid a flash of the wrong theme.
+    (function () {
+      document.documentElement.classList.add('js');
+      var t = localStorage.getItem('wyind-theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 
-<body>
+<body class="gate-open">
 
-
-
-  <canvas id="click-canvas" aria-hidden="true"></canvas>
-
-  <div id="boot-overlay" role="dialog" aria-modal="true" aria-label="Start screen">
-    <canvas id="boot-scene" class="scene" aria-hidden="true"></canvas>
-    <div class="boot-hud"><span>1UP 000420</span><span>HI-SCORE 099999</span><span>CREDIT 01</span></div>
-    <div class="boot-window">
-      <div class="boot-content">
-        <img class="boot-sprite" src="avatar-pixel.png" alt="" />
-        <div class="boot-logo">WYIND</div>
-        <div class="boot-sub">- LINUX TINKERER -</div>
-        <div class="boot-lines">
-          <div class="boot-line">&gt; TRACKPOINT ........ OK</div>
-          <div class="boot-line">&gt; FEDORA BTRFS ...... OK</div>
-          <div class="boot-line">&gt; SERVER CAT ........ FED</div>
-          <div class="boot-line">&gt; AUDIO CONSOLE ..... OK</div>
-        </div>
-        <div class="boot-load"><span>LOADING</span><div class="boot-bar"><i></i></div></div>
-        <div class="boot-prompt-wrap">
-          <div class="boot-prompt" id="boot-btn"><span>&#9654; PRESS START</span></div>
-          <div class="boot-hint">CLICK OR PRESS ANY KEY</div>
-        </div>
-      </div>
-      <div class="boot-footer-bar"><span>&copy; 2026 WYIND</span><span>1 PLAYER</span></div>
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Enter site">
+    <div class="gate-scan" aria-hidden="true"></div>
+    <div class="gate-inner">
+      <img class="gate-avatar" src="avatar.jpg" alt="wyind avatar" />
+      <div class="gate-name">wyind</div>
+      <p class="gate-sub">Linux &middot; browsers &middot; TUI tools</p>
+      <button id="enter-btn" class="enter-btn" type="button">click to enter</button>
     </div>
   </div>
 
-  <nav id="navbar">
-    <div class="nav-left">
-      <a href="#hero" class="brand-prompt" aria-label="Scroll to top">
-        <span class="tp-dot">●</span>
-        <span>wyind@thinkpad:~</span>
-      </a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a href="#top" class="logo">wyind</a>
+      <nav class="nav">
+        <a href="#about">About</a>
+        <a href="#studio">Studio</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+        <a href="https://github.com/Wyind" target="_blank" rel="noopener">GitHub</a>
+        <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme (t)"></button>
+      </nav>
     </div>
+  </header>
 
-    <div class="nav-links">
-      <a href="#about">[01:about]</a>
-      <a href="#studio">[02:studio]</a>
-      <a href="#projects">[03:projects]</a>
-      <a href="#contact">[04:contact]</a>
-      <a href="https://github.com/Wyind" target="_blank" rel="noopener">[github]</a>
-      <a href="https://x.com/wyindszn" target="_blank" rel="noopener">[x/twitter]</a>
+  <main class="wrap" id="top">
+
+    <section class="hero">
+      <img class="avatar" src="avatar.jpg" alt="wyind avatar" />
+
+      <h1>wyind</h1>
+      <p class="tagline">Linux tinkerer. ThinkPad enthusiast. Building browsers and TUI stuff.</p>
+
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#projects">See projects</a>
+        <a class="btn" href="https://github.com/Wyind" target="_blank" rel="noopener">GitHub &#8599;</a>
+        <a class="btn" href="https://x.com/wyindszn" target="_blank" rel="noopener">X / Twitter &#8599;</a>
+      </div>
+
+      <div class="spec-sheet">
+        <div><span class="k">OS</span><span>Ubuntu 26.04.1 LTS</span></div>
+        <div><span class="k">Host</span><span> wyind@fucksnaps &middot; desktop PC</span></div>
+        <div><span class="k">CPU</span><span>Intel Core i9-9900K &middot; 8c / 16t</span></div>
+        <div><span class="k">GPU</span><span>NVIDIA GeForce RTX 3080</span></div>
+        <div><span class="k">RAM</span><span>48 GB</span></div>
+        <div><span class="k">Kernel</span><span>7.0.0-38-generic</span></div>
+        <div><span class="k">Desktop</span><span>GNOME on Wayland</span></div>
+        <div><span class="k">Terminal</span><span>kitty &middot; bash</span></div>
+        <div><span class="k">Editor</span><span>nvim / aether</span></div>
+        <div><span class="k">Toolchain</span><span>C, Rust, Go, Python, Bash</span></div>
+        <div><span class="k">Focus</span><span>Browsers, TUI tools, Linux tinkering</span></div>
+        <div><span class="k">Laptop</span><span>ThinkPad X13 Gen 2 &middot; different setup w/ Fedora</span></div>
+      </div>
+    </section>
+
+    <section id="about">
+      <h2>About</h2>
+      <div class="prose">
+        <p>
+          Hey, I'm <strong>wyind.</strong> I make stuff for Linux. Mostly browsers, TUI tools, and whatever else sounds fun at 2am.
+        </p>
+        <p>
+          My daily driver is a desktop PC running <strong>Ubuntu 26.04</strong>. My <strong>ThinkPad X13 Gen 2</strong> is a different setup and stays on Fedora. There is also a <strong>T420</strong> that's been sitting in a box with a broken screen for a while now. I'll fix it eventually, but who really cares :)
+        </p>
+        <p>
+          I'm really into <strong>Right to Repair</strong>. Things should be built to last, be fixable, and not need a subscription to exist. Same reason I love <strong>Casio watches</strong> and ThinkPads: honest, durable, repairable hardware. I thought about getting a <strong>Fairphone Gen 6 +</strong>, but I haven't committed yet.
+        </p>
+        <p>
+          Outside of video games and coding I like cat gifs quite a bit.
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="specs">
+          <thead>
+            <tr><th>Component</th><th>Configuration</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Primary OS</td><td>Ubuntu 26.04.1 LTS</td><td>Desktop only</td></tr>
+            <tr><td>Laptop</td><td>ThinkPad X13 Gen 2</td><td>Different setup, stays on Fedora</td></tr>
+            <tr><td>Hardware</td><td>i9-9900K &middot; RTX 3080 &middot; 48 GB + X13 + T420</td><td>T420 screen needs replacing. It'll happen.</td></tr>
+            <tr><td>Philosophy</td><td>Right to Repair</td><td>ThinkPads, Casio watches, things built to last</td></tr>
+            <tr><td>Toolchain</td><td>C, Rust, Go, Python, Bash</td><td>TUI dev and systems tinkering</td></tr>
+            <tr><td>Workspace</td><td>kitty, nvim, custom TUIs</td><td>Keyboard-first, minimal</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="studio">
+      <h2>Studio</h2>
+      <div class="studio">
+        <div class="studio-logo">
+          <img src="abyss_software_logo_transparent_arrow.svg" alt="Abyss Software logo" />
+        </div>
+        <div>
+          <h3>Abyss Software</h3>
+          <p>Where my projects live. Browsers, tooling, and weird little things I build to understand how stuff works.</p>
+          <a class="text-link" href="https://github.com/abysssoftware-dev" target="_blank" rel="noopener">github.com/abysssoftware-dev &#8599;</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2>Projects</h2>
+      <div class="projects">
+        <article class="card">
+          <div class="card-head">
+            <h3>Umbra Browser</h3>
+          </div>
+          <p>A browser I'm building from scratch. Fast, private, and mine.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <h3>ascii-studio</h3>
+          </div>
+          <p>Make ASCII art, avatars, and banners in your terminal.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <h3>aether</h3>
+          </div>
+          <p>A TUI text editor and IDE. Lives in the terminal.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p class="prose">Feel free to reach out regarding Linux tinkering, web browsers, or open-source software.</p>
+      <div class="contact-links">
+        <a class="btn btn-primary" href="https://github.com/Wyind" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="https://x.com/wyindszn" target="_blank" rel="noopener">X / Twitter</a>
+        <a class="btn" href="#top">Back to top</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>&copy; <span id="year">2026</span> wyind</span>
+      <span class="muted">All systems nominal.</span>
     </div>
-
-    <div class="nav-right">
-      <div class="status-leds" title="ThinkPad Status Indicators">
-        <span class="led pwr" title="Power OK"></span>
-        <span class="led bat" title="Battery AC 99%"></span>
-        <span class="led disk" id="disk-led" title="Disk Activity"></span>
-        <span>AC:OK</span>
-      </div>
-
-      <button id="settings-toggle-btn" class="thinklight-btn" title="Open Settings (S)">
-        <span><i class="fa-solid fa-gear"></i> Settings</span>
-      </button>
-    </div>
-  </nav>
-
-  <main>
-
-    <section id="hero" class="tui-window">
-      <div class="tui-titlebar">
-        <div class="title-left">
-          <span class="badge">SYSINFO</span>
-          <span>wyind@thinkpad:~ (fastfetch)</span>
-        </div>
-        <div class="controls">
-          <span>_</span>
-          <span>□</span>
-          <span>×</span>
-        </div>
-      </div>
-
-      <div class="tui-content">
-        <canvas id="hero-scene" class="scene" aria-hidden="true"></canvas>
-        <div class="hero-grid">
-          <div class="avatar-frame">
-            <img src="avatar.png" alt="wyind avatar: blue loop witch" />
-            <div class="avatar-caption">
-              <span class="red-nub"></span>
-              <span>avatar.png</span>
-            </div>
-          </div>
-
-          <div class="hero-info">
-            <h1 class="name">wy<span class="name-i"><span class="name-i-dot"></span><span class="name-i-letter">i</span></span>nd.</h1>
-            <p class="hero-tagline">Linux tinkerer. ThinkPad enthusiast. Building browsers and TUI stuff.</p>
-
-            <div class="terminal-box">
-              <div><span class="cmd">$ fastfetch --pipe</span></div>
-              <div class="output">
-                <span class="key">User:</span><span>wyind (uid=1000)</span>
-                <span class="key">OS:</span><span>Fedora Linux 44 Workstation x86_64</span>
-                <span class="key">Host:</span><span>Desktop PC + ThinkPad X13 Gen 2</span>
-                <span class="key">Terminal:</span><span>kitty</span>
-                <span class="key">Shell:</span><span>bash</span>
-                <span class="key">Editor:</span><span>nvim / aether</span>
-                <span class="key">Focus:</span><span>Browsers, TUI tools, Linux tinkering</span>
-              </div>
-            </div>
-
-            <div class="quick-badges">
-              <a href="#about" class="badge-pill">➔ read about.txt</a>
-              <a href="#studio" class="badge-pill">➔ visit studio</a>
-              <a href="#projects" class="badge-pill">➔ view projects</a>
-              <a href="#contact" class="badge-pill">➔ ssh connect</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="about" class="tui-window">
-      <div class="tui-titlebar">
-        <div class="title-left">
-          <span class="badge">VIM</span>
-          <span>/home/wyind/about.txt [RO]</span>
-        </div>
-        <div class="controls">
-          <span>utf-8</span>
-          <span>100%</span>
-        </div>
-      </div>
-
-      <div class="tui-content">
-        <div class="about-text">
-          <p>
-            Hey, I'm <strong>wyind.</strong> I make stuff for Linux. Mostly browsers, TUI tools, and whatever else sounds fun at 2am.
-          </p>
-          <p>
-            My daily driver is a desktop PC running <strong>Fedora</strong>. I also have a <strong>ThinkPad X13 Gen 2</strong>, also running Fedora. There is also a <strong>T420</strong> that's been sitting in a box with a broken screen for a while now. I'll fix it eventually, but who really cares :)
-          </p>
-          <p>
-            I'm really into <strong>Right to Repair</strong>. Things should be built to last, be fixable, and not need a subscription to exist. Same reason I love <strong>Casio watches</strong> and ThinkPads: honest, durable, repairable hardware. I thought about getting a <strong>Fairphone Gen 6 +</strong>, but I haven't committed yet.
-          </p>
-          <p>
-            Outside of video games and coding I like cat gifs quite a bit.
-          </p>
-
-          <table class="specs-table">
-            <thead>
-              <tr>
-                <th>Component</th>
-                <th>Configuration</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Primary OS</td>
-                <td>Fedora Linux Workstation</td>
-                <td>Desktop PC and ThinkPad X13 Gen 2</td>
-              </tr>
-              <tr>
-                <td>Hardware</td>
-                <td>Desktop PC + ThinkPad X13 Gen 2 + T420</td>
-                <td>T420 screen needs replacing. It'll happen.</td>
-              </tr>
-              <tr>
-                <td>Philosophy</td>
-                <td>Right to Repair</td>
-                <td>ThinkPads, Casio watches, things built to last</td>
-              </tr>
-              <tr>
-                <td>Toolchain</td>
-                <td>C, Rust, Go, Python, Bash</td>
-                <td>TUI dev and systems tinkering</td>
-              </tr>
-              <tr>
-                <td>Workspace</td>
-                <td>kitty, nvim, custom TUIs</td>
-                <td>Keyboard-first, minimal</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section id="studio" class="tui-window">
-      <div class="tui-titlebar">
-        <div class="title-left">
-          <span class="badge">STUDIO</span>
-          <span>abyss-software.dev (organization)</span>
-        </div>
-        <div class="controls">
-          <span>git:main</span>
-          <span>online</span>
-        </div>
-      </div>
-
-      <div class="tui-content">
-        <div class="studio-panel">
-          <div class="studio-logo-box">
-            <img src="abyss_software_logo_transparent_arrow.svg" alt="Abyss Software Logo" />
-          </div>
-          <div class="studio-body">
-            <h3>Abyss Software</h3>
-            <p>
-              Where my projects live. Browsers, tooling, and weird little things I build to understand how stuff works.
-            </p>
-            <a class="tui-link-btn" href="https://github.com/abysssoftware-dev" target="_blank" rel="noopener">
-              <span>➔ github.com/abysssoftware-dev</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="projects" class="tui-window">
-      <div class="tui-titlebar">
-        <div class="title-left">
-          <span class="badge">PROJECTS</span>
-          <span>~/projects/manifest.json</span>
-        </div>
-        <div class="controls">
-          <span>3 active</span>
-        </div>
-      </div>
-
-      <div class="tui-content">
-        <div class="projects-grid">
-          <div class="project-card">
-            <div>
-              <div class="card-header">
-                <h4>Umbra Browser</h4>
-                <span class="project-type">BROWSER</span>
-              </div>
-              <p>A browser I'm building from scratch. Fast, private, and mine.</p>
-            </div>
-            <a class="tui-link-btn" href="https://umbra-browser.org" target="_blank" rel="noopener">
-              <span>➔ umbra-browser.org</span>
-            </a>
-          </div>
-
-          <div class="project-card">
-            <div>
-              <div class="card-header">
-                <h4>ascii-studio</h4>
-                <span class="project-type">TUI UTILITY</span>
-              </div>
-              <p>Make ASCII art, avatars, and banners in your terminal.</p>
-            </div>
-            <a class="tui-link-btn" href="https://github.com/Wyind/ascii-studio" target="_blank" rel="noopener">
-              <span>➔ github.com/Wyind/ascii-studio</span>
-            </a>
-          </div>
-
-          <div class="project-card">
-            <div>
-              <div class="card-header">
-                <h4>aether</h4>
-                <span class="project-type">TUI IDE / EDITOR</span>
-              </div>
-              <p>A TUI text editor and IDE. Lives in the terminal.</p>
-            </div>
-            <a class="tui-link-btn" href="https://github.com/Wyind/aether" target="_blank" rel="noopener">
-              <span>➔ github.com/Wyind/aether</span>
-            </a>
-          </div>
-
-          <div class="project-card placeholder">
-            <div>
-              <div>[+] Incoming Projects</div>
-              <div style="font-size: 0.76rem; margin-top: 6px; color: var(--text-muted);">more tools &amp; utilities in progress</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" class="tui-window">
-      <div class="tui-titlebar">
-        <div class="title-left">
-          <span class="badge">SSH</span>
-          <span>ssh wyind@wyind.dev [port 22]</span>
-        </div>
-        <div class="controls">
-          <span>established</span>
-        </div>
-      </div>
-
-      <div class="tui-content">
-        <div class="contact-content">
-          <div class="terminal-box" style="margin-bottom: 8px;">
-            <div><span class="cmd">$ ssh guest@wyind.dev</span></div>
-            <div style="margin-top: 6px; color: var(--text-dim); font-size: 0.84rem;">
-              Authenticated as root. Connected to wyind@wyind.dev's terminal session.<br>
-              Feel free to reach out regarding Linux tinkering, web browsers, or open-source software:
-            </div>
-          </div>
-
-          <div class="contact-links">
-            <a class="contact-btn" href="https://github.com/Wyind" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12" />
-              </svg>
-              <span>github/Wyind</span>
-            </a>
-
-            <a class="contact-btn" href="https://x.com/wyindszn" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-              <span>x/wyindszn</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    </main>
-
-<footer style="text-align: center;">
-    <span>2026 wyind. All systems nominal.</span>
   </footer>
 
-  <aside id="audio-dock">
-    <div id="music-panel" class="collapsed" role="region" aria-label="ThinkPad Audio Player">
-      <div class="player-header">
-        <span>THE BIG AUDIO CONSOLE [ucw.bin]</span>
-        <button id="player-close-btn" class="player-btn" aria-label="Close audio player">×</button>
+  <div class="music-dock">
+    <div id="music-panel" class="music-panel hidden" role="region" aria-label="Music player">
+      <div class="panel-head">
+        <span>Now playing</span>
+        <button id="player-close-btn" class="icon-btn" aria-label="Close player">&times;</button>
       </div>
 
-      <div class="player-track-info">
-        <div class="player-title" id="player-track-title">Cold Like December v4</div>
-        <div class="player-artist" id="player-track-artist">SailorHearts</div>
+      <div class="track-info">
+        <div class="track-title" id="player-track-title">&mdash;</div>
+        <div class="track-artist" id="player-track-artist">&mdash;</div>
       </div>
 
-      <div class="player-progress-wrap">
-        <div class="player-bar-track" id="player-progress-bar">
-          <div class="player-bar-fill" id="player-progress-fill"></div>
-        </div>
-        <div class="player-time-row">
-          <span id="player-current-time">0:00</span>
-          <span id="player-duration">3:34</span>
-        </div>
+      <div class="progress" id="player-progress-bar" role="slider" aria-label="Seek" tabindex="0">
+        <div class="progress-fill" id="player-progress-fill"></div>
+      </div>
+      <div class="time-row">
+        <span id="player-current-time">0:00</span>
+        <span id="player-duration">0:00</span>
       </div>
 
-      <div class="player-controls">
-        <button id="player-shuffle-btn" class="player-btn" title="Toggle Shuffle"><i class="fa-solid fa-shuffle"></i></button>
-        <button id="player-prev-btn" class="player-btn" title="Previous Track"><i class="fa-solid fa-backward-step"></i></button>
-        <button id="player-play-btn" class="player-btn play-main" title="Play/Pause">PLAY</button>
-        <button id="player-next-btn" class="player-btn" title="Next Track"><i class="fa-solid fa-forward-step"></i></button>
-        <button id="player-repeat-btn" class="player-btn" title="Toggle Repeat"><i class="fa-solid fa-repeat"></i></button>
+      <div class="controls">
+        <button id="player-prev-btn" class="ctrl" title="Previous">&#9198;</button>
+        <button id="player-play-btn" class="ctrl play" title="Play / Pause">&#9654;</button>
+        <button id="player-next-btn" class="ctrl" title="Next">&#9197;</button>
       </div>
 
-      <div class="player-volume-row">
-        <span>VOL:</span>
-        <input type="range" id="player-vol-slider" class="player-vol-slider" min="0" max="1" step="0.02" value="0.12" aria-label="Volume slider" />
+      <div class="volume-row">
+        <span>Vol</span>
+        <input type="range" id="player-vol-slider" min="0" max="1" step="0.02" value="0.2" aria-label="Volume" />
       </div>
 
-      <div class="player-playlist" id="player-playlist-items">
-      </div>
+      <div class="playlist" id="player-playlist-items"></div>
     </div>
 
-    <div class="audio-dock-buttons">
-      <button id="sfx-toggle-btn" class="dock-pill" title="Toggle Mechanical Click SFX">
-        <span><i class="fa-solid fa-keyboard"></i> CLICKS: ON</span>
-      </button>
-
-      <button id="music-toggle-btn" class="dock-pill" title="Toggle Music Player">
-        <span class="trackpoint-nub" id="trackpoint-indicator"></span>
-        <span id="dock-title-preview">Cold Like December v4</span>
-      </button>
-    </div>
-  </aside>
-
-  <div id="settings-overlay" aria-hidden="true">
-    <div class="settings-window" role="dialog" aria-modal="true" aria-label="Settings">
-      <div class="tui-titlebar settings-titlebar">
-        <div class="title-left">
-          <span class="badge">CONFIG</span>
-          <span>~/.config/wyind/settings.ini</span>
-        </div>
-        <div class="controls">
-          <span class="settings-status" id="settings-status">SAVED</span>
-          <button id="settings-close-btn" class="player-btn" aria-label="Close settings">&#10005;</button>
-        </div>
-      </div>
-
-      <div class="settings-body">
-        <nav class="settings-nav" id="settings-nav" aria-label="Settings sections">
-          <span class="settings-nav-head">SECTIONS</span>
-        </nav>
-        <div class="settings-content" id="settings-content"></div>
-      </div>
-
-      <div class="settings-statusbar">
-        <span>wyind-settings v1 &bull; autosaves to localStorage</span>
-        <span><kbd>ESC</kbd> close &bull; <kbd>S</kbd> settings &bull; <kbd>M</kbd> mute</span>
-        <button id="settings-reset-btn" class="thinklight-btn settings-reset-btn" title="Restore all defaults">
-          <span><i class="fa-solid fa-rotate-left"></i> RESET DEFAULTS</span>
-        </button>
-      </div>
-    </div>
+    <button id="music-toggle-btn" class="music-toggle" title="Toggle music player">
+      <span class="dot"></span>
+      <span id="dock-title-preview">Music</span>
+    </button>
   </div>
 
-  <script src="settings.js"></script>
-  <script src="pixel.js"></script>
-  <script src="script.js"></script>\n  <script src="games.js"></script>
+  <script src="script.js"></script>
 
 </body>
-
 </html>
