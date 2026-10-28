@@ -8,7 +8,7 @@ export default function App() {
       <AsciiField />
 
       <header className="wrap header">
-        <a href="#top" className="logo">wyind</a>
+        <a href="#top" className="logo">wyind<span className="caret" aria-hidden="true">_</span></a>
         <nav className="nav">
           <a href="#about">About</a>
           <a href="#projects">Projects</a>
@@ -32,7 +32,7 @@ export default function App() {
         </section>
 
         <section id="about">
-          <h2>About</h2>
+          <h2>## about</h2>
           <div className="prose">
             <p>
               Hey, I'm <strong>wyind.</strong> I make stuff for Linux. Mostly browsers, TUI tools, and whatever else sounds fun at 2am.
@@ -62,7 +62,7 @@ export default function App() {
         </section>
 
         <section id="projects">
-          <h2>Projects</h2>
+          <h2>## projects</h2>
           <p className="projects-intro">
             <img src="/abyss_software_logo_transparent_arrow.svg" alt="" width="20" height="20" />
             <span>Everything below lives under <a href="https://github.com/abysssoftware-dev" target="_blank" rel="noopener">Abyss Software &#8599;</a>, where my stuff ends up.</span>
@@ -90,7 +90,7 @@ export default function App() {
         </section>
 
         <section id="contact">
-          <h2>Contact</h2>
+          <h2>## contact</h2>
           <p className="prose">If you want to talk about Linux, browsers, or open source, I'm easy to find.</p>
           <p className="links">
             <a href="https://github.com/Wyind" target="_blank" rel="noopener">GitHub &#8599;</a>
@@ -98,12 +98,24 @@ export default function App() {
           </p>
         </section>
 
+        <section id="colophon">
+          <h2>## colophon</h2>
+          <div className="prose">
+            <p>
+              React + Vite, because I wanted to try it. The background is one canvas I wrote by hand: glyphs that scatter when you poke them.
+            </p>
+            <p>
+              No cookies, no analytics, no newsletter box. Last updated October 2026 — probably rewritten again before long.
+            </p>
+          </div>
+        </section>
+
       </main>
 
       <footer>
         <div className="wrap footer">
           <span>&copy; {year} wyind</span>
-          <span>made by hand. no trackers.</span>
+          <span>view source is encouraged</span>
         </div>
       </footer>
     </>

@@ -33,7 +33,7 @@ export default function AsciiField() {
       const r = Math.round(118 + (74 - 118) * k);
       const g = Math.round(148 + (222 - 148) * k);
       const b = Math.round(130 + (128 - 130) * k);
-      const a = 0.13 + 0.34 * k;
+      const a = 0.16 + 0.31 * k;
       styles.push('rgba(' + r + ',' + g + ',' + b + ',' + a.toFixed(3) + ')');
     }
 
@@ -51,7 +51,7 @@ export default function AsciiField() {
     let drift = 0;
 
     function scramble() {
-      return Math.random() < 0.22 ? 0 : 1 + ((Math.random() * 4) | 0);
+      return Math.random() < 0.16 ? 0 : 1 + ((Math.random() * 4) | 0);
     }
 
     function seed() {

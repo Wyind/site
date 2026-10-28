@@ -75,7 +75,15 @@ img {
   font-weight: 700;
   color: var(--text);
   text-decoration: none;
-  letter-spacing: -0.01em;
+}
+
+.logo .caret {
+  color: var(--accent);
+  animation: caret-blink 1.1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% { opacity: 0; }
 }
 
 .nav {
@@ -104,7 +112,6 @@ main.wrap {
   margin-bottom: 26px;
   background: var(--scrim);
   border: 1px solid var(--border);
-  border-radius: 14px;
 }
 
 section + section {
@@ -113,22 +120,29 @@ section + section {
   border-top: 1px solid var(--border);
 }
 
+/* section headings are literally typed out as "## about" etc, in mono,
+   the way they'd look in the readme of whatever repo they point at */
 h2 {
-  font-size: 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.95rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
+  color: var(--text);
   margin-bottom: 18px;
 }
 
 .hero .avatar {
   width: 72px;
   height: 72px;
-  border-radius: 16px;
+  border-radius: 4px;
   object-fit: cover;
   border: 1px solid var(--border);
   margin-bottom: 18px;
+  transform: rotate(-1.8deg);
+  transition: transform 0.2s ease;
+}
+
+.hero .avatar:hover {
+  transform: rotate(0deg);
 }
 
 .hero h1 {
@@ -153,12 +167,11 @@ h2 {
 
 .links a {
   font-size: 0.9rem;
-  text-decoration: none;
+  text-underline-offset: 3px;
 }
 
 .links a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
 }
 
 .prose {
@@ -175,7 +188,7 @@ h2 {
 }
 
 h3 {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
   margin-top: 30px;
   margin-bottom: 12px;
@@ -220,12 +233,11 @@ h3 {
 }
 
 .projects-intro a {
-  text-decoration: none;
+  text-underline-offset: 3px;
 }
 
 .projects-intro a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
 }
 
 .project-list {
@@ -237,6 +249,7 @@ h3 {
 .project-list h3 {
   margin-top: 0;
   margin-bottom: 2px;
+  font-family: var(--mono);
 }
 
 .project-list p {
@@ -246,12 +259,11 @@ h3 {
 
 .project-list a {
   font-size: 0.86rem;
-  text-decoration: none;
+  text-underline-offset: 3px;
 }
 
 .project-list a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
 }
 
 footer {
@@ -293,5 +305,9 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .logo .caret {
+    animation: none;
   }
 }
