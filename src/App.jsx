@@ -7,7 +7,7 @@ const DEFAULT_SETTINGS = {
   muted: false,
   stars: true,
   glitch: true,
-  openOnStartup: true,
+  openOnStartup: false,
   desktopSettingsIcon: true,
 };
 
@@ -28,6 +28,7 @@ export default function App() {
       return {
         ...DEFAULT_SETTINGS,
         ...base,
+        openOnStartup: base.openOnStartup ?? false,
         muted: base.muted !== undefined ? base.muted : legacyMuted === '1',
       };
     } catch {
