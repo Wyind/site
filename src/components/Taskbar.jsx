@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ComputerIcon, FlagIcon } from './icons.jsx';
+import { ComputerIcon, StartGlyph } from './icons.jsx';
 
 export default function Taskbar({ open, onToggle, onNav, onBoot, onShutdown }) {
   const [startOpen, setStartOpen] = useState(false);
@@ -46,6 +46,9 @@ export default function Taskbar({ open, onToggle, onNav, onBoot, onShutdown }) {
     <div className="taskbar">
       {startOpen && (
         <div className="start-menu" role="menu">
+          <div className="start-banner" aria-hidden="true">
+            <span>wyind98</span>
+          </div>
           <div className="start-items">
             <button
               type="button"
@@ -93,7 +96,7 @@ export default function Taskbar({ open, onToggle, onNav, onBoot, onShutdown }) {
         aria-label="Start"
         onClick={() => setStartOpen((v) => !v)}
       >
-        <FlagIcon />
+        <StartGlyph />
         <span>Start</span>
       </button>
       <button

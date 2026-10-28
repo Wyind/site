@@ -23,15 +23,16 @@ export function ComputerIcon({ small = false }) {
   );
 }
 
-export function FlagIcon() {
+export function StartGlyph() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-      <g transform="skewY(-6)">
-        <rect x="1" y="4" width="6" height="5" fill="#f35325" />
-        <rect x="8" y="3" width="6" height="5" fill="#81bc06" />
-        <rect x="1" y="10" width="6" height="5" fill="#05a6f0" />
-        <rect x="8" y="9" width="6" height="5" fill="#ffb900" />
-      </g>
+    <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges" aria-hidden="true">
+      <rect x="7" y="1" width="2" height="14" fill="#a99fdb" />
+      <rect x="1" y="7" width="14" height="2" fill="#a99fdb" />
+      <rect x="3" y="3" width="2" height="2" fill="#6a619b" />
+      <rect x="11" y="3" width="2" height="2" fill="#6a619b" />
+      <rect x="3" y="11" width="2" height="2" fill="#6a619b" />
+      <rect x="11" y="11" width="2" height="2" fill="#6a619b" />
+      <rect x="6" y="6" width="4" height="4" fill="#dcd9ea" />
     </svg>
   );
 }

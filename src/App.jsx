@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { makeStars } from './stars.js';
-import { ComputerIcon, FlagIcon, ErrorIcon, SpeakerIcon, SpeakerOffIcon } from './components/icons.jsx';
+import { ComputerIcon, ErrorIcon, SpeakerIcon, SpeakerOffIcon } from './components/icons.jsx';
 import Taskbar from './components/Taskbar.jsx';
-
-const TASKBAR_H = 28;
 
 export default function App() {
   const year = new Date().getFullYear();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [maximized, setMaximized] = useState(false);
-  const [pos, setPos] = useState(null);
   const [showError, setShowError] = useState(false);
   const [shutdown, setShutdown] = useState(false);
   const [ctxMenu, setCtxMenu] = useState(null);
@@ -125,8 +122,12 @@ export default function App() {
   }, [shutdown]);
 
   function requestBoot() {
-    if (open || booting) return;
+    if (booting) return;
     setCtxMenu(null);
+    if (open) {
+      focusWindow();
+      return;
+    }
     runBoot();
   }
 
@@ -135,7 +136,6 @@ export default function App() {
     bootTimersRef.current = [];
     setOpen(false);
     setMaximized(false);
-    setPos(null);
     setShutdown(false);
     runBoot();
   }
@@ -205,56 +205,9 @@ export default function App() {
     setMaximized((v) => !v);
   }
 
-  function onTitleDown(e) {
-    if (e.button !== 0 || maximized) return;
-    if (e.target.closest('.title-bar-controls')) return;
-    const el = windowRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const fromX = rect.left;
-    const fromY = rect.top;
-    setPos({ x: fromX, y: fromY });
-    function onMove(ev) {
-      const x = Math.max(-620, Math.min(fromX + (ev.clientX - startX), window.innerWidth - 80));
-      const y = Math.max(0, Math.min(fromY + (ev.clientY - startY), window.innerHeight - 60));
-      setPos({ x, y });
-    }
-    function onUp() {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-    }
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-  }
-
   function refreshStars() {
     document.documentElement.style.backgroundImage = 'url("' + makeStars() + '")';
   }
-
-  const winStyle = maximized
-    ? {
-        position: 'fixed',
-        margin: 0,
-        left: 0,
-        top: 0,
-        right: 0,
-        bottom: TASKBAR_H,
-        maxWidth: 'none',
-        width: 'auto',
-        zIndex: 10,
-      }
-    : pos
-      ? {
-          position: 'fixed',
-          margin: 0,
-          left: pos.x,
-          top: pos.y,
-          width: 'min(680px, calc(100vw - 8px))',
-          zIndex: 10,
-        }
-      : {};
 
   return (
     <>
@@ -301,16 +254,15 @@ export default function App() {
       <div
         ref={windowRef}
         className={'window site-window' + (maximized ? ' is-max' : '') + (glitching ? ' is-glitch' : '')}
-        style={winStyle}
         hidden={!open}
         tabIndex={-1}
         onPointerDown={() => setCtxMenu(null)}
       >
-        <div className="title-bar active" onPointerDown={onTitleDown} onDoubleClick={toggleMax}>
+        <div className="title-bar active" onDoubleClick={toggleMax}>
           <span className="title-bar-text">wyind</span>
           <div className="title-bar-controls">
             <button type="button" aria-label="Minimize" onClick={() => setOpen(false)} />
-            <button type="button" aria-label="Maximize" onClick={toggleMax} />
+            <button type="button" aria-label={maximized ? 'Restore' : 'Maximize'} onClick={toggleMax} />
             <button type="button" aria-label="Close" onClick={() => setShowError(true)} />
           </div>
         </div>
