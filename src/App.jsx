@@ -47,18 +47,6 @@ export default function App() {
               Outside of games and code, I like cat gifs quite a bit.
             </p>
           </div>
-
-          <h3>What I'm running</h3>
-          <ul className="specs">
-            <li><span>os</span> Ubuntu 26.04.1 LTS</li>
-            <li><span>host</span> wyind@fucksnaps &middot; desktop PC</li>
-            <li><span>laptop</span> ThinkPad X13 Gen 2 &middot; Fedora</li>
-            <li><span>cpu</span> Intel i9-9900K &middot; 8c / 16t</li>
-            <li><span>gpu</span> NVIDIA RTX 3080</li>
-            <li><span>ram</span> 48 GB</li>
-            <li><span>editor</span> nvim / aether</li>
-            <li><span>langs</span> C, Rust, Go, Python, Bash</li>
-          </ul>
         </section>
 
         <section id="projects">

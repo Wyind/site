@@ -173,36 +173,6 @@ h2 {
   font-weight: 600;
 }
 
-h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-top: 30px;
-  margin-bottom: 12px;
-}
-
-.specs {
-  list-style: none;
-  font-family: var(--mono);
-  font-size: 0.83rem;
-  display: grid;
-  gap: 6px;
-  color: var(--muted);
-}
-
-.specs li {
-  display: flex;
-  gap: 10px;
-}
-
-.specs span {
-  color: var(--accent);
-  min-width: 66px;
-}
-
-.specs span::after {
-  content: ":";
-}
-
 .projects-intro {
   display: flex;
   align-items: center;
@@ -233,9 +203,10 @@ h3 {
 }
 
 .project-list h3 {
-  margin-top: 0;
-  margin-bottom: 2px;
   font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 2px;
 }
 
 .project-list p {
@@ -265,10 +236,6 @@ footer {
   padding-top: 22px;
   padding-bottom: 30px;
   font-size: 0.8rem;
-  color: var(--muted);
-}
-
-.footer span {
   color: var(--muted);
 }
 
