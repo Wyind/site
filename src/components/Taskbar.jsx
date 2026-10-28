@@ -1,7 +1,20 @@
 import { useEffect, useState } from 'react';
-import { ComputerIcon, StartGlyph } from './icons.jsx';
+import { ComputerIcon, SettingsIcon, SpeakerIcon, SpeakerOffIcon, StartGlyph } from './icons.jsx';
 
-export default function Taskbar({ open, onToggle, onNav, onBoot, onShutdown }) {
+export default function Taskbar({
+  isOpen,
+  isMinimized,
+  onToggle,
+  onNav,
+  onOpenWyind,
+  onMyComputer,
+  onShutdown,
+  showSettings,
+  onToggleSettings,
+  onOpenSettings,
+  muted,
+  onToggleMute,
+}) {
   const [startOpen, setStartOpen] = useState(false);
   const [clock, setClock] = useState('');
   const [pcSrc, setPcSrc] = useState('/mypc.png');
@@ -55,7 +68,18 @@ export default function Taskbar({ open, onToggle, onNav, onBoot, onShutdown }) {
               role="menuitem"
               onClick={() => {
                 setStartOpen(false);
-                onBoot();
+                onOpenWyind();
+              }}
+            >
+              <img src="/avatar.jpg" width="16" height="16" alt="" style={{ borderRadius: '2px' }} />
+              <span>wyind</span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setStartOpen(false);
+                onMyComputer();
               }}
             >
               {pcSrc ? (
@@ -64,6 +88,17 @@ export default function Taskbar({ open, onToggle, onNav, onBoot, onShutdown }) {
                 <ComputerIcon small />
               )}
               <span>My Computer</span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setStartOpen(false);
+                onOpenSettings();
+              }}
+            >
+              <SettingsIcon small />
+              <span>Settings</span>
             </button>
             <div className="start-sep" />
             <button type="button" role="menuitem" onClick={() => nav('about')}>
@@ -99,15 +134,57 @@ export default function Taskbar({ open, onToggle, onNav, onBoot, onShutdown }) {
         <StartGlyph />
         <span>Start</span>
       </button>
-      <button
-        type="button"
-        className={'taskbar-window' + (open ? ' is-open is-pressed' : '')}
-        onClick={onToggle}
-      >
-        <span>wyind</span>
-      </button>
+
+      {isOpen && (
+        <button
+          type="button"
+          className={'taskbar-window' + (!isMinimized ? ' is-open is-pressed' : '')}
+          onClick={onToggle}
+          title={!isMinimized ? 'Click to minimize wyind' : 'Click to restore wyind'}
+        >
+          <img
+            src="/avatar.jpg"
+            width="14"
+            height="14"
+            alt=""
+            style={{ borderRadius: '1px', flexShrink: 0 }}
+          />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>wyind</span>
+        </button>
+      )}
+
+      {showSettings && (
+        <button
+          type="button"
+          className="taskbar-window is-open is-pressed"
+          onClick={onToggleSettings}
+          title={showSettings ? 'Click to minimize Settings' : 'Click to restore Settings'}
+        >
+          <SettingsIcon small />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Settings</span>
+        </button>
+      )}
+
       <div className="taskbar-spacer" />
       <div className="taskbar-tray">
+        <button
+          type="button"
+          className="tray-btn"
+          onClick={onOpenSettings}
+          aria-label="Settings"
+          title="Settings"
+        >
+          <SettingsIcon small />
+        </button>
+        <button
+          type="button"
+          className="tray-btn"
+          onClick={onToggleMute}
+          aria-label={muted ? 'Unmute sound' : 'Mute sound'}
+          title={muted ? 'Sound: Muted' : 'Sound: Enabled'}
+        >
+          {muted ? <SpeakerOffIcon /> : <SpeakerIcon />}
+        </button>
         <span className="taskbar-clock">{clock}</span>
       </div>
     </div>

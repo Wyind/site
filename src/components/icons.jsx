@@ -66,3 +66,24 @@ export function SpeakerOffIcon() {
     </svg>
   );
 }
+
+export function SettingsIcon({ small = false }) {
+  const s = small ? 16 : 32;
+  return (
+    <svg width={s} height={s} viewBox="0 0 16 16" shapeRendering="crispEdges" aria-hidden="true">
+      <rect x="2" y="1" width="12" height="14" fill="#d4d0c8" />
+      <rect x="2" y="1" width="12" height="1" fill="#ffffff" />
+      <rect x="2" y="1" width="1" height="14" fill="#ffffff" />
+      <rect x="13" y="2" width="1" height="13" fill="#404040" />
+      <rect x="3" y="14" width="11" height="1" fill="#404040" />
+      <rect x="5" y="3" width="1" height="9" fill="#808080" />
+      <rect x="6" y="3" width="1" height="9" fill="#ffffff" />
+      <rect x="4" y="5" width="4" height="3" fill="#202070" />
+      <rect x="4" y="5" width="4" height="1" fill="#6060c0" />
+      <rect x="10" y="3" width="1" height="9" fill="#808080" />
+      <rect x="11" y="3" width="1" height="9" fill="#ffffff" />
+      <rect x="9" y="8" width="4" height="3" fill="#202070" />
+      <rect x="9" y="8" width="4" height="1" fill="#6060c0" />
+    </svg>
+  );
+}

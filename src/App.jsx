@@ -1,47 +1,103 @@
 import { useEffect, useRef, useState } from 'react';
 import { makeStars } from './stars.js';
-import { ComputerIcon, ErrorIcon, SpeakerIcon, SpeakerOffIcon } from './components/icons.jsx';
+import { ComputerIcon, SettingsIcon, SpeakerIcon, SpeakerOffIcon } from './components/icons.jsx';
 import Taskbar from './components/Taskbar.jsx';
+
+const DEFAULT_SETTINGS = {
+  muted: false,
+  stars: true,
+  glitch: true,
+  openOnStartup: true,
+  desktopSettingsIcon: true,
+};
+
+const BOOT_STAGES = [
+  'Scanning drives and reading drive C:\\ ...',
+  'Checking filesystem integrity and device registry...',
+  'Loading VxD VMM32 virtual memory subsystem...',
+  'Addressing memory page 0028:C0011E36...',
+];
 
 export default function App() {
   const year = new Date().getFullYear();
-  const [open, setOpen] = useState(true);
+  const [settings, setSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem('wyind-settings');
+      const base = saved ? JSON.parse(saved) : {};
+      const legacyMuted = localStorage.getItem('wyind-muted');
+      return {
+        ...DEFAULT_SETTINGS,
+        ...base,
+        muted: base.muted !== undefined ? base.muted : legacyMuted === '1',
+      };
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
+  });
+
+  const [isOpen, setIsOpen] = useState(settings.openOnStartup);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [maximized, setMaximized] = useState(false);
-  const [showError, setShowError] = useState(false);
+  const [mainPos, setMainPos] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsPos, setSettingsPos] = useState(null);
+  const [bsod, setBsod] = useState(false);
   const [shutdown, setShutdown] = useState(false);
   const [ctxMenu, setCtxMenu] = useState(null);
   const [booting, setBooting] = useState(false);
+  const [bootPos, setBootPos] = useState(null);
+  const [bootProgress, setBootProgress] = useState(0);
+  const [bootStage, setBootStage] = useState(0);
   const [glitching, setGlitching] = useState(false);
   const [pcSrc, setPcSrc] = useState('/mypc.png');
-  const [muted, setMuted] = useState(() => {
-    try {
-      return localStorage.getItem('wyind-muted') === '1';
-    } catch {
-      return false;
-    }
-  });
+  const [dragOutline, setDragOutline] = useState(null);
 
   const windowRef = useRef(null);
   const iconRef = useRef(null);
   const bootAudioRef = useRef(null);
   const bootTimersRef = useRef([]);
-  const mutedRef = useRef(muted);
-  mutedRef.current = muted;
+  const fadeIntervalRef = useRef(null);
+  const mutedRef = useRef(settings.muted);
+  mutedRef.current = settings.muted;
   const shutdownBtnRef = useRef(null);
 
   useEffect(() => {
-    document.documentElement.style.backgroundImage = 'url("' + makeStars() + '")';
-  }, []);
+    try {
+      localStorage.setItem('wyind-settings', JSON.stringify(settings));
+      localStorage.setItem('wyind-muted', settings.muted ? '1' : '0');
+    } catch {}
+  }, [settings]);
+
+  function updateSetting(key, val) {
+    setSettings((prev) => ({ ...prev, [key]: val }));
+  }
+
+  useEffect(() => {
+    if (settings.stars) {
+      document.documentElement.style.backgroundImage = 'url("' + makeStars() + '")';
+    } else {
+      document.documentElement.style.backgroundImage = 'none';
+    }
+  }, [settings.stars]);
 
   useEffect(() => {
     function onKey(e) {
-      if (e.key !== 'Escape') return;
-      setCtxMenu(null);
-      setShowError(false);
+      if (bsod) {
+        setBsod(false);
+        return;
+      }
+      if (e.key === 'Escape') {
+        if (booting) {
+          cancelBoot();
+          return;
+        }
+        setCtxMenu(null);
+        setShowSettings(false);
+      }
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, []);
+  }, [bsod, booting]);
 
   useEffect(() => {
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -99,19 +155,17 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('wyind-muted', muted ? '1' : '0');
-    } catch {}
-  }, [muted]);
-
-  useEffect(() => {
     document.documentElement.classList.toggle('is-booting', booting);
     return () => document.documentElement.classList.remove('is-booting');
   }, [booting]);
 
   useEffect(
     () => () => {
-      bootTimersRef.current.forEach((t) => clearTimeout(t));
+      bootTimersRef.current.forEach((t) => {
+        clearTimeout(t);
+        clearInterval(t);
+      });
+      if (fadeIntervalRef.current) clearInterval(fadeIntervalRef.current);
       if (bootAudioRef.current) bootAudioRef.current.pause();
     },
     []
@@ -121,69 +175,131 @@ export default function App() {
     if (shutdown && shutdownBtnRef.current) shutdownBtnRef.current.focus();
   }, [shutdown]);
 
-  function requestBoot() {
-    if (booting) return;
-    setCtxMenu(null);
-    if (open) {
-      focusWindow();
-      return;
-    }
-    runBoot();
-  }
-
-  function reboot() {
-    bootTimersRef.current.forEach((t) => clearTimeout(t));
+  function cancelBoot() {
+    bootTimersRef.current.forEach((t) => {
+      clearTimeout(t);
+      clearInterval(t);
+    });
     bootTimersRef.current = [];
-    setOpen(false);
-    setMaximized(false);
-    setShutdown(false);
-    runBoot();
+
+    setBooting(false);
+    setGlitching(false);
+    setBootProgress(0);
+    setBootStage(0);
+    setBootPos(null);
+
+    // Fade out audio smoothly
+    if (bootAudioRef.current && !bootAudioRef.current.paused) {
+      const audio = bootAudioRef.current;
+      if (fadeIntervalRef.current) clearInterval(fadeIntervalRef.current);
+      const startVol = audio.volume;
+      const steps = 15;
+      let step = 0;
+      fadeIntervalRef.current = setInterval(() => {
+        step += 1;
+        audio.volume = Math.max(0, startVol * (1 - step / steps));
+        if (step >= steps) {
+          clearInterval(fadeIntervalRef.current);
+          fadeIntervalRef.current = null;
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = 0.8;
+        }
+      }, 40);
+    }
   }
 
-  function runBoot() {
+  function startBoot() {
+    if (booting) return;
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+    cancelBoot();
     setBooting(true);
-    const audio = new Audio('/boot.mp3');
-    audio.volume = 0.8;
-    audio.play().catch(() => {});
-    bootAudioRef.current = audio;
+    setGlitching(false);
+    setBootProgress(0);
+    setBootStage(0);
+
+    if (!settings.muted) {
+      const audio = new Audio('/boot.mp3');
+      audio.volume = 0.8;
+      audio.play().catch(() => {});
+      bootAudioRef.current = audio;
+    }
+
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(100, Math.round((elapsed / 36000) * 100));
+      setBootProgress(pct);
+      if (elapsed >= 36000) {
+        clearInterval(interval);
+      }
+    }, 250);
+    bootTimersRef.current.push(interval);
+
     bootTimersRef.current.push(
+      setTimeout(() => setBootStage(1), 9000),
+      setTimeout(() => setBootStage(2), 19000),
       setTimeout(() => {
-        setOpen(true);
-        setGlitching(true);
-        const el = windowRef.current;
-        if (el) el.focus({ preventScroll: true });
-      }, 30000)
-    );
-    bootTimersRef.current.push(
+        setBootStage(3);
+        if (settings.glitch) setGlitching(true);
+      }, 29000),
       setTimeout(() => {
-        setGlitching(false);
+        if (bootAudioRef.current) {
+          bootAudioRef.current.pause();
+          bootAudioRef.current.currentTime = 0;
+        }
+        clearInterval(interval);
         setBooting(false);
-        const a = bootAudioRef.current;
-        if (!a) return;
-        let step = 0;
-        const fade = setInterval(() => {
-          step += 1;
-          a.volume = Math.max(0, 0.8 * (1 - step / 10));
-          if (step >= 10) {
-            clearInterval(fade);
-            a.pause();
-          }
-        }, 100);
+        setGlitching(false);
+        setBootProgress(0);
+        setBootPos(null);
+        setBsod(true);
       }, 36000)
     );
   }
 
+  function reboot() {
+    cancelBoot();
+    setIsOpen(false);
+    setIsMinimized(false);
+    setMaximized(false);
+    setShutdown(false);
+    setBsod(false);
+    startBoot();
+  }
+
   function focusWindow() {
-    setOpen(true);
     requestAnimationFrame(() => {
       const el = windowRef.current;
       if (el) el.focus({ preventScroll: true });
     });
   }
 
+  function openWyind() {
+    setIsOpen(true);
+    setIsMinimized(false);
+    focusWindow();
+  }
+
+  function minimizeWyind() {
+    setIsMinimized(true);
+  }
+
+  function toggleWyind() {
+    if (isMinimized) {
+      setIsMinimized(false);
+      focusWindow();
+    } else {
+      setIsMinimized(true);
+    }
+  }
+
   function openAt(section) {
     setCtxMenu(null);
-    focusWindow();
+    openWyind();
     if (section) {
       requestAnimationFrame(() => {
         const el = document.getElementById(section);
@@ -193,8 +309,8 @@ export default function App() {
   }
 
   function closeWindow() {
-    setOpen(false);
-    setShowError(false);
+    setIsOpen(false);
+    setIsMinimized(false);
     setMaximized(false);
     requestAnimationFrame(() => {
       if (iconRef.current) iconRef.current.focus();
@@ -206,7 +322,59 @@ export default function App() {
   }
 
   function refreshStars() {
-    document.documentElement.style.backgroundImage = 'url("' + makeStars() + '")';
+    if (settings.stars) {
+      document.documentElement.style.backgroundImage = 'url("' + makeStars() + '")';
+    }
+  }
+
+  // Windows 98 Wireframe Window Dragging
+  function startWindowDrag(e, targetType) {
+    if (e.button !== 0 || e.target.closest('.title-bar-controls, button, a')) return;
+    if (targetType === 'main' && maximized) return;
+
+    const windowSelector = targetType === 'main'
+      ? '.site-window'
+      : targetType === 'settings'
+        ? '.settings-window'
+        : '.loading-dialog';
+
+    const el = e.currentTarget.closest(windowSelector);
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const shiftX = e.clientX - rect.left;
+    const shiftY = e.clientY - rect.top;
+    const width = rect.width;
+    const height = rect.height;
+
+    let currentX = rect.left;
+    let currentY = rect.top;
+
+    setDragOutline({ x: currentX, y: currentY, width, height });
+
+    function onPointerMove(ev) {
+      currentX = Math.max(0, Math.min(window.innerWidth - width, ev.clientX - shiftX));
+      currentY = Math.max(0, Math.min(window.innerHeight - height - 30, ev.clientY - shiftY));
+      setDragOutline({ x: currentX, y: currentY, width, height });
+    }
+
+    function onPointerUp() {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      setDragOutline(null);
+
+      // Teleport window to outline's final position
+      if (targetType === 'main') {
+        setMainPos({ x: currentX, y: currentY });
+      } else if (targetType === 'settings') {
+        setSettingsPos({ x: currentX, y: currentY });
+      } else if (targetType === 'boot') {
+        setBootPos({ x: currentX, y: currentY });
+      }
+    }
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
   }
 
   return (
@@ -214,7 +382,7 @@ export default function App() {
       <div
         className="desktop"
         onContextMenu={(e) => {
-          if (e.target.closest('.window, .taskbar, .desktop-icon, .error-dialog')) return;
+          if (e.target.closest('.window, .taskbar, .desktop-icon, .settings-window, .bsod-screen, .loading-dialog')) return;
           e.preventDefault();
           setCtxMenu({
             x: Math.min(e.clientX, window.innerWidth - 170),
@@ -224,14 +392,47 @@ export default function App() {
         onPointerDown={() => setCtxMenu(null)}
       />
 
-      <button type="button" ref={iconRef} className="desktop-icon" onClick={requestBoot}>
-        {pcSrc ? (
-          <img src={pcSrc} width="32" height="32" alt="" onError={() => setPcSrc(null)} />
-        ) : (
-          <ComputerIcon />
+      <div className="desktop-icons">
+        <button
+          type="button"
+          ref={iconRef}
+          className="desktop-icon"
+          onClick={startBoot}
+        >
+          {pcSrc ? (
+            <img src={pcSrc} width="32" height="32" alt="" onError={() => setPcSrc(null)} />
+          ) : (
+            <ComputerIcon />
+          )}
+          <span className="desktop-icon-label">My Computer</span>
+        </button>
+
+        <button
+          type="button"
+          className="desktop-icon"
+          onClick={openWyind}
+        >
+          <img
+            src="/avatar.jpg"
+            width="32"
+            height="32"
+            alt=""
+            style={{ border: '1px solid var(--hl-1)' }}
+          />
+          <span className="desktop-icon-label">wyind</span>
+        </button>
+
+        {settings.desktopSettingsIcon && (
+          <button
+            type="button"
+            className="desktop-icon"
+            onClick={() => setShowSettings(true)}
+          >
+            <SettingsIcon />
+            <span className="desktop-icon-label">Settings</span>
+          </button>
         )}
-        <span className="desktop-icon-label">My Computer</span>
-      </button>
+      </div>
 
       {ctxMenu && (
         <div className="ctx-menu" style={{ left: ctxMenu.x, top: ctxMenu.y }} role="menu">
@@ -245,7 +446,14 @@ export default function App() {
           >
             Refresh
           </button>
-          <button type="button" role="menuitem" onClick={() => openAt('about')}>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setCtxMenu(null);
+              setShowSettings(true);
+            }}
+          >
             Properties
           </button>
         </div>
@@ -253,17 +461,26 @@ export default function App() {
 
       <div
         ref={windowRef}
-        className={'window site-window' + (maximized ? ' is-max' : '') + (glitching ? ' is-glitch' : '')}
-        hidden={!open}
+        className={'window site-window' + (maximized ? ' is-max' : '') + (glitching && settings.glitch ? ' is-glitch' : '')}
+        hidden={!isOpen || isMinimized}
         tabIndex={-1}
+        style={
+          !maximized && mainPos
+            ? { left: `${mainPos.x}px`, top: `${mainPos.y}px`, right: 'auto', marginInline: 0 }
+            : undefined
+        }
         onPointerDown={() => setCtxMenu(null)}
       >
-        <div className="title-bar active" onDoubleClick={toggleMax}>
+        <div
+          className="title-bar active"
+          onDoubleClick={toggleMax}
+          onPointerDown={(e) => startWindowDrag(e, 'main')}
+        >
           <span className="title-bar-text">wyind</span>
           <div className="title-bar-controls">
-            <button type="button" aria-label="Minimize" onClick={() => setOpen(false)} />
+            <button type="button" aria-label="Minimize" onClick={minimizeWyind} />
             <button type="button" aria-label={maximized ? 'Restore' : 'Maximize'} onClick={toggleMax} />
-            <button type="button" aria-label="Close" onClick={() => setShowError(true)} />
+            <button type="button" aria-label="Close" onClick={closeWindow} />
           </div>
         </div>
 
@@ -354,41 +571,204 @@ export default function App() {
             <button
               type="button"
               className="mute-btn"
-              onClick={() => setMuted((v) => !v)}
-              aria-pressed={muted}
-              aria-label={muted ? 'Unmute' : 'Mute'}
-              title={muted ? 'Sound off' : 'Sound on'}
+              onClick={() => updateSetting('muted', !settings.muted)}
+              aria-pressed={settings.muted}
+              aria-label={settings.muted ? 'Unmute' : 'Mute'}
+              title={settings.muted ? 'Sound off' : 'Sound on'}
             >
-              {muted ? <SpeakerOffIcon /> : <SpeakerIcon />}
+              {settings.muted ? <SpeakerOffIcon /> : <SpeakerIcon />}
             </button>
           </div>
         </div>
       </div>
 
-      {showError && (
-        <div className="error-dialog" role="dialog" aria-modal="true" aria-label="Error">
-          <div className="title-bar active">
-            <span className="title-bar-text">Error</span>
+      {booting && (
+        <div
+          className={'loading-dialog window' + (glitching && settings.glitch ? ' is-glitch' : '')}
+          role="dialog"
+          aria-modal="false"
+          aria-label="Starting My Computer"
+          style={
+            bootPos
+              ? { left: `${bootPos.x}px`, top: `${bootPos.y}px`, transform: 'none' }
+              : undefined
+          }
+          onPointerDown={() => setCtxMenu(null)}
+        >
+          <div className="title-bar active" onPointerDown={(e) => startWindowDrag(e, 'boot')}>
+            <span className="title-bar-text">My Computer</span>
+            <div className="title-bar-controls">
+              <button type="button" aria-label="Close" onClick={cancelBoot} />
+            </div>
           </div>
-          <div className="dialog-body">
-            <ErrorIcon />
-            <p>This program has performed an illegal operation and must be closed.</p>
-          </div>
-          <div className="dialog-actions">
-            <button type="button" onClick={closeWindow}>OK</button>
+          <div className="window-body">
+            <div className="loading-content">
+              {pcSrc ? (
+                <img src={pcSrc} width="32" height="32" alt="" onError={() => setPcSrc(null)} />
+              ) : (
+                <ComputerIcon />
+              )}
+              <div className="loading-text">
+                <span>{BOOT_STAGES[bootStage] || BOOT_STAGES[0]}</span>
+              </div>
+            </div>
+            <div className="progress-indicator segmented">
+              <span className="progress-indicator-bar" style={{ width: `${bootProgress}%` }} />
+            </div>
+            <div className="dialog-actions">
+              <button type="button" onClick={cancelBoot}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
 
+      {showSettings && (
+        <div
+          className="settings-window"
+          role="dialog"
+          aria-modal="false"
+          aria-label="Settings"
+          style={
+            settingsPos
+              ? { left: `${settingsPos.x}px`, top: `${settingsPos.y}px`, transform: 'none' }
+              : undefined
+          }
+          onPointerDown={() => setCtxMenu(null)}
+        >
+          <div className="title-bar active" onPointerDown={(e) => startWindowDrag(e, 'settings')}>
+            <span className="title-bar-text">Settings</span>
+            <div className="title-bar-controls">
+              <button type="button" aria-label="Close" onClick={() => setShowSettings(false)} />
+            </div>
+          </div>
+
+          <div className="window-body">
+            <fieldset>
+              <legend>Sound</legend>
+              <div className="field-row">
+                <input
+                  type="checkbox"
+                  id="setting-sound"
+                  checked={!settings.muted}
+                  onChange={(e) => updateSetting('muted', !e.target.checked)}
+                />
+                <label htmlFor="setting-sound">Enable sound effects (clicks, boot sound)</label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Display</legend>
+              <div className="field-row">
+                <input
+                  type="checkbox"
+                  id="setting-stars"
+                  checked={settings.stars}
+                  onChange={(e) => updateSetting('stars', e.target.checked)}
+                />
+                <label htmlFor="setting-stars">Starfield wallpaper</label>
+              </div>
+              <div className="field-row">
+                <input
+                  type="checkbox"
+                  id="setting-glitch"
+                  checked={settings.glitch}
+                  onChange={(e) => updateSetting('glitch', e.target.checked)}
+                />
+                <label htmlFor="setting-glitch">CRT & glitch effects</label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Desktop</legend>
+              <div className="field-row">
+                <input
+                  type="checkbox"
+                  id="setting-startup"
+                  checked={settings.openOnStartup}
+                  onChange={(e) => updateSetting('openOnStartup', e.target.checked)}
+                />
+                <label htmlFor="setting-startup">Open wyind page on startup</label>
+              </div>
+              <div className="field-row">
+                <input
+                  type="checkbox"
+                  id="setting-desktopicon"
+                  checked={settings.desktopSettingsIcon}
+                  onChange={(e) => updateSetting('desktopSettingsIcon', e.target.checked)}
+                />
+                <label htmlFor="setting-desktopicon">Show Settings shortcut on desktop</label>
+              </div>
+            </fieldset>
+
+            <div className="dialog-actions">
+              <button type="button" onClick={() => setShowSettings(false)}>
+                OK
+              </button>
+              <button type="button" onClick={() => setShowSettings(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {bsod && (
+        <div
+          className="bsod-screen"
+          role="alertdialog"
+          tabIndex={0}
+          onClick={() => setBsod(false)}
+          ref={(el) => el && el.focus()}
+        >
+          <div className="bsod-inner">
+            <div className="bsod-header-wrap">
+              <span className="bsod-header">Windows</span>
+            </div>
+            <p>
+              A fatal exception 0E has occurred at 0028:C0011E36 in VXD VMM(01) +
+              00010E36. The current application will be terminated.
+            </p>
+            <br />
+            <p>* Press any key to terminate the current application.</p>
+            <p>
+              * Press CTRL+ALT+DEL again to restart your computer. You will lose any
+              unsaved information in all applications.
+            </p>
+            <br />
+            <p>
+              Press any key or click to continue <span className="bsod-blink">_</span>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {dragOutline && (
+        <div
+          className="window-drag-outline"
+          style={{
+            left: `${dragOutline.x}px`,
+            top: `${dragOutline.y}px`,
+            width: `${dragOutline.width}px`,
+            height: `${dragOutline.height}px`,
+          }}
+        />
+      )}
+
       <Taskbar
-        open={open || booting}
-        onToggle={() => {
-          if (booting) return;
-          setOpen((v) => !v);
-        }}
+        isOpen={isOpen}
+        isMinimized={isMinimized}
+        onToggle={toggleWyind}
         onNav={openAt}
-        onBoot={requestBoot}
+        onOpenWyind={openWyind}
+        onMyComputer={startBoot}
         onShutdown={() => setShutdown(true)}
+        showSettings={showSettings}
+        onToggleSettings={() => setShowSettings((v) => !v)}
+        onOpenSettings={() => setShowSettings(true)}
+        muted={settings.muted}
+        onToggleMute={() => updateSetting('muted', !settings.muted)}
       />
 
       {shutdown && (
