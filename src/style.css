@@ -29,6 +29,8 @@ body {
   color: var(--text);
   background: transparent;
   -webkit-font-smoothing: antialiased;
+  /* soft halo so text stays readable over hot cells of the field */
+  text-shadow: 0 1px 10px rgba(5, 10, 7, 0.75);
 }
 
 #bg {
@@ -109,25 +111,6 @@ h2 {
   letter-spacing: 0.1em;
   color: var(--muted);
   margin-bottom: 18px;
-}
-
-.hero {
-  position: relative;
-  isolation: isolate;
-}
-
-.hero > canvas {
-  position: absolute;
-  inset: -12px -20px;
-  z-index: -1;
-  pointer-events: none;
-}
-
-/* keeps the name and tagline legible even when a hot cell sits behind them */
-.hero h1,
-.hero .tagline,
-.hero .links {
-  text-shadow: 0 1px 10px rgba(5, 10, 7, 0.85);
 }
 
 .hero .avatar {

@@ -1,4 +1,3 @@
-import Pipes from './components/Pipes.jsx';
 import AsciiField from './components/AsciiField.jsx';
 
 export default function App() {
@@ -6,7 +5,7 @@ export default function App() {
 
   return (
     <>
-      <Pipes />
+      <AsciiField />
 
       <header className="wrap header">
         <a href="#top" className="logo">wyind</a>
@@ -20,8 +19,6 @@ export default function App() {
       <main className="wrap" id="top">
 
         <section className="hero">
-          <AsciiField />
-
           <img className="avatar" src="/avatar.jpg" alt="wyind" width="72" height="72" />
 
           <h1>wyind</h1>

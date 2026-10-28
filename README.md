@@ -2,9 +2,10 @@
 
 This is the repository for my website.
 
-React + Vite, hand-written CSS, no analytics. Two canvas things going on:
-a retro pipes screensaver behind the whole page, and a mouse-reactive ASCII
-field behind the hero.
+React + Vite, hand-written CSS, no analytics. Behind everything sits one
+canvas: a reactive ASCII field. Glyphs heat up and swirl around your cursor,
+scatter when you click, and keep re-scrambling a few at a time when you're
+not there.
 
 ## Local
 
