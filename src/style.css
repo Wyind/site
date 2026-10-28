@@ -13,7 +13,6 @@
   --text: #f1f5f2;
   --muted: #a8b5ac;
   --accent: #4ade80;
-  /* the reading sheet: text sits on this, the field ghosts through at 10% */
   --scrim: rgba(21, 25, 23, 0.9);
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
@@ -31,7 +30,6 @@ body {
   color: var(--text);
   background: transparent;
   -webkit-font-smoothing: antialiased;
-  /* soft halo so text stays readable over hot cells of the field */
   text-shadow: 0 1px 10px rgba(5, 10, 7, 0.75);
 }
 
@@ -65,7 +63,7 @@ img {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-top: 18px;
+  padding-top: 30px;
   padding-bottom: 18px;
   border-bottom: 1px solid var(--border);
   background: var(--scrim);
@@ -75,15 +73,6 @@ img {
   font-weight: 700;
   color: var(--text);
   text-decoration: none;
-}
-
-.logo .caret {
-  color: var(--accent);
-  animation: caret-blink 1.1s steps(1) infinite;
-}
-
-@keyframes caret-blink {
-  50% { opacity: 0; }
 }
 
 .nav {
@@ -104,7 +93,6 @@ img {
   text-underline-offset: 3px;
 }
 
-/* main.wrap: the class selector would zero out main's margins otherwise */
 main.wrap {
   padding-top: 34px;
   padding-bottom: 44px;
@@ -120,8 +108,6 @@ section + section {
   border-top: 1px solid var(--border);
 }
 
-/* section headings are literally typed out as "## about" etc, in mono,
-   the way they'd look in the readme of whatever repo they point at */
 h2 {
   font-family: var(--mono);
   font-size: 0.95rem;
@@ -305,9 +291,5 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-
-  .logo .caret {
-    animation: none;
   }
 }

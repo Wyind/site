@@ -8,7 +8,7 @@ export default function App() {
       <AsciiField />
 
       <header className="wrap header">
-        <a href="#top" className="logo">wyind<span className="caret" aria-hidden="true">_</span></a>
+        <a href="#top" className="logo">wyind</a>
         <nav className="nav">
           <a href="#about">About</a>
           <a href="#projects">Projects</a>
@@ -96,18 +96,6 @@ export default function App() {
             <a href="https://github.com/Wyind" target="_blank" rel="noopener">GitHub &#8599;</a>
             <a href="https://x.com/wyindszn" target="_blank" rel="noopener">X / Twitter &#8599;</a>
           </p>
-        </section>
-
-        <section id="colophon">
-          <h2>## colophon</h2>
-          <div className="prose">
-            <p>
-              React + Vite, because I wanted to try it. The background is one canvas I wrote by hand: glyphs that scatter when you poke them.
-            </p>
-            <p>
-              No cookies, no analytics, no newsletter box. Last updated October 2026 — probably rewritten again before long.
-            </p>
-          </div>
         </section>
 
       </main>

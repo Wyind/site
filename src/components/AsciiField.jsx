@@ -1,7 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-// the whole page is the field: glyphs that heat up and swirl around the
-// cursor, scatter when you click, and re-scramble a few at a time when idle.
 const CHARS = ' .:-~=+*#01%&$@';
 const CELL_W = 11;
 const CELL_H = 21;
@@ -25,8 +23,6 @@ export default function AsciiField() {
     const reduced =
       window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // 16 pre-baked stops from dim gray-green up to the accent green,
-    // so the hot loop never parses a color string
     const styles = [];
     for (let i = 0; i < 16; i++) {
       const k = i / 15;
@@ -110,7 +106,6 @@ export default function AsciiField() {
       const rot = time * 0.6;
       const reach2 = REACH * REACH;
 
-      // age the click shockwaves
       for (let i = pulses.length - 1; i >= 0; i--) {
         pulses[i].t += dt;
         if (pulses[i].t > WAVE_LIFE) pulses.splice(i, 1);
@@ -122,11 +117,9 @@ export default function AsciiField() {
       for (let i = 0; i < cells.length; i++) {
         const c = cells[i];
 
-        // the spring that pulls everything home, always on
         let ax = (c.hx - c.x) * SPRING;
         let ay = (c.hy - c.y) * SPRING;
 
-        // cursor: push away, plus a slow orbit so it turns instead of bulges
         const dx = c.x - mx;
         const dy = c.y - my;
         const d2 = dx * dx + dy * dy;
@@ -150,7 +143,6 @@ export default function AsciiField() {
           ay += Math.sin(ang) * swirl;
         }
 
-        // clicks send a shockwave rippling through the field
         for (let p = 0; p < pulses.length; p++) {
           const pl = pulses[p];
           const px = c.x - pl.x;
@@ -199,7 +191,6 @@ export default function AsciiField() {
       last = ts;
       time += dt;
 
-      // a few idle cells re-scramble now and then, so the field breathes
       drift += dt;
       let tick = false;
       if (drift > 0.7) {
@@ -215,8 +206,6 @@ export default function AsciiField() {
       const go = moved;
       moved = false;
 
-      // when everything has settled and the mouse is quiet, keep the last
-      // frame on screen and stop doing any work at all
       if (awake || go || tick || pulses.length > 0) {
         awake = step(dt);
       }
