@@ -4,82 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>wyind</title>
-  <meta name="description" content="wyind. Linux tinkerer building browsers, TUI tools, and systems software on PC other shit on a ThinkPad X13." />
+  <meta name="description" content="wyind. Linux tinkerer building browsers, TUI tools, and systems software on a desktop PC and a ThinkPad X13." />
   <meta property="og:title" content="wyind" />
-  <meta property="og:description" content="Linux tinkerer building browsers, TUI tools, and systems software on PC and on a ThinkPad X13." />
+  <meta property="og:description" content="Linux tinkerer building browsers, TUI tools, and systems software on a desktop PC and a ThinkPad X13." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="avatar.jpg" />
   <link rel="icon" href="avatar.jpg" />
   <link rel="stylesheet" href="style.css" />
-  <noscript>
-    <style>
-      .gate { display: none !important; }
-      body.gate-open { overflow: auto !important; }
-    </style>
-  </noscript>
-  <script>
-    (function () {
-      document.documentElement.classList.add('js');
-      var t = localStorage.getItem('wyind-theme');
-      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
 </head>
 
-<body class="gate-open">
+<body>
 
-  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Enter site">
-    <div class="gate-scan" aria-hidden="true"></div>
-    <div class="gate-inner">
-      <img class="gate-avatar" src="avatar.jpg" alt="wyind avatar" />
-      <div class="gate-name">wyind</div>
-      <p class="gate-sub">Linux &middot; browsers &middot; TUI tools</p>
-      <button id="enter-btn" class="enter-btn" type="button">click to enter</button>
-    </div>
-  </div>
+  <canvas id="bg" aria-hidden="true"></canvas>
 
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <a href="#top" class="logo">wyind</a>
-      <nav class="nav">
-        <a href="#about">About</a>
-        <a href="#studio">Studio</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
-        <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme (t)"></button>
-      </nav>
-    </div>
+  <header class="wrap header">
+    <a href="#top" class="logo">wyind</a>
+    <nav class="nav">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
   </header>
 
   <main class="wrap" id="top">
 
     <section class="hero">
-      <img class="avatar" src="avatar.jpg" alt="wyind avatar" />
+      <img class="avatar" src="avatar.jpg" alt="wyind" width="72" height="72" />
 
       <h1>wyind</h1>
-      <p class="tagline">Linux tinkerer. ThinkPad enthusiast. Building browsers and TUI stuff.</p>
+      <p class="tagline">I tinker with Linux, build browsers, and make terminal tools. Usually at 2am.</p>
 
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="#projects">See projects</a>
-        <a class="btn" href="https://github.com/Wyind" target="_blank" rel="noopener">GitHub &#8599;</a>
-        <a class="btn" href="https://x.com/wyindszn" target="_blank" rel="noopener">X / Twitter &#8599;</a>
-      </div>
-
-      <div class="spec-sheet">
-        <div><span class="k">OS</span><span>Ubuntu 26.04.1 LTS</span></div>
-        <div><span class="k">Host</span><span> wyind@fucksnaps &middot; desktop PC</span></div>
-        <div><span class="k">CPU</span><span>Intel Core i9-9900K &middot; 8c / 16t</span></div>
-        <div><span class="k">GPU</span><span>NVIDIA GeForce RTX 3080</span></div>
-        <div><span class="k">RAM</span><span>48 GB</span></div>
-        <div><span class="k">Kernel</span><span>7.0.0-38-generic</span></div>
-        <div><span class="k">Desktop</span><span>GNOME on Wayland</span></div>
-        <div><span class="k">Terminal</span><span>kitty &middot; bash</span></div>
-        <div><span class="k">Editor</span><span>nvim / aether</span></div>
-        <div><span class="k">Toolchain</span><span>C, Rust, Go, Python, Bash</span></div>
-        <div><span class="k">Focus</span><span>Browsers, TUI tools, Linux tinkering</span></div>
-        <div><span class="k">Laptop</span><span>ThinkPad X13 Gen 2 &middot; different setup w/ Fedora</span></div>
-      </div>
+      <p class="links">
+        <a href="https://github.com/Wyind" target="_blank" rel="noopener">GitHub &#8599;</a>
+        <a href="https://x.com/wyindszn" target="_blank" rel="noopener">X / Twitter &#8599;</a>
+        <a href="#projects">Projects</a>
+      </p>
     </section>
 
     <section id="about">
@@ -89,134 +48,74 @@
           Hey, I'm <strong>wyind.</strong> I make stuff for Linux. Mostly browsers, TUI tools, and whatever else sounds fun at 2am.
         </p>
         <p>
-          My daily driver is a desktop PC running <strong>Ubuntu 26.04</strong>. My <strong>ThinkPad X13 Gen 2</strong> is a different setup and stays on Fedora. There is also a <strong>T420</strong> that's been sitting in a box with a broken screen for a while now. I'll fix it eventually, but who really cares :)
+          My daily driver is a desktop running <strong>Ubuntu 26.04</strong>. The <strong>ThinkPad X13 Gen 2</strong> is a separate setup and stays on Fedora. There's also a <strong>T420</strong> sitting in a box with a broken screen &mdash; I'll fix it eventually, who really cares :)
         </p>
         <p>
-          I'm really into <strong>Right to Repair</strong>. Things should be built to last, be fixable, and not need a subscription to exist. Same reason I love <strong>Casio watches</strong> and ThinkPads: honest, durable, repairable hardware. I thought about getting a <strong>Fairphone Gen 6 +</strong>, but I haven't committed yet.
+          I'm really into <strong>right to repair</strong>. Things should be built to last, be fixable, and not need a subscription to exist. Same reason I love <strong>Casio watches</strong> and ThinkPads: honest, durable, repairable hardware. I keep thinking about a <strong>Fairphone 6</strong>, but I haven't committed yet.
         </p>
         <p>
-          Outside of video games and coding I like cat gifs quite a bit.
+          Outside of games and code, I like cat gifs quite a bit.
         </p>
       </div>
 
-      <div class="table-wrap">
-        <table class="specs">
-          <thead>
-            <tr><th>Component</th><th>Configuration</th><th>Notes</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Primary OS</td><td>Ubuntu 26.04.1 LTS</td><td>Desktop only</td></tr>
-            <tr><td>Laptop</td><td>ThinkPad X13 Gen 2</td><td>Different setup, stays on Fedora</td></tr>
-            <tr><td>Hardware</td><td>i9-9900K &middot; RTX 3080 &middot; 48 GB + X13 + T420</td><td>T420 screen needs replacing. It'll happen.</td></tr>
-            <tr><td>Philosophy</td><td>Right to Repair</td><td>ThinkPads, Casio watches, things built to last</td></tr>
-            <tr><td>Toolchain</td><td>C, Rust, Go, Python, Bash</td><td>TUI dev and systems tinkering</td></tr>
-            <tr><td>Workspace</td><td>kitty, nvim, custom TUIs</td><td>Keyboard-first, minimal</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section id="studio">
-      <h2>Studio</h2>
-      <div class="studio">
-        <div class="studio-logo">
-          <img src="abyss_software_logo_transparent_arrow.svg" alt="Abyss Software logo" />
-        </div>
-        <div>
-          <h3>Abyss Software</h3>
-          <p>Where my projects live. Browsers, tooling, and weird little things I build to understand how stuff works.</p>
-          <a class="text-link" href="https://github.com/abysssoftware-dev" target="_blank" rel="noopener">github.com/abysssoftware-dev &#8599;</a>
-        </div>
-      </div>
+      <h3>What I'm running</h3>
+      <ul class="specs">
+        <li><span>os</span> Ubuntu 26.04.1 LTS</li>
+        <li><span>host</span> wyind@fucksnaps &middot; desktop PC</li>
+        <li><span>laptop</span> ThinkPad X13 Gen 2 &middot; Fedora</li>
+        <li><span>cpu</span> Intel i9-9900K &middot; 8c / 16t</li>
+        <li><span>gpu</span> NVIDIA RTX 3080</li>
+        <li><span>ram</span> 48 GB</li>
+        <li><span>editor</span> nvim / aether</li>
+        <li><span>langs</span> C, Rust, Go, Python, Bash</li>
+      </ul>
     </section>
 
     <section id="projects">
       <h2>Projects</h2>
-      <div class="projects">
-        <article class="card">
-          <div class="card-head">
-            <h3>Umbra Browser</h3>
-          </div>
+      <p class="projects-intro">
+        <img src="abyss_software_logo_transparent_arrow.svg" alt="" width="20" height="20" />
+        <span>Everything below lives under <a href="https://github.com/abysssoftware-dev" target="_blank" rel="noopener">Abyss Software &#8599;</a>, where my stuff ends up.</span>
+      </p>
+
+      <ul class="project-list">
+        <li>
+          <h3>Umbra Browser</h3>
           <p>A browser I'm building from scratch. Fast, private, and mine.</p>
-          <a class="text-link" href="https://umbra-browser.org" target="_blank" rel="noopener">umbra-browser.org &#8599;</a>
-        </article>
+          <a href="https://umbra-browser.org" target="_blank" rel="noopener">umbra-browser.org &#8599;</a>
+        </li>
 
-        <article class="card">
-          <div class="card-head">
-            <h3>ascii-studio</h3>
-          </div>
+        <li>
+          <h3>ascii-studio</h3>
           <p>Make ASCII art, avatars, and banners in your terminal.</p>
-          <a class="text-link" href="https://github.com/Wyind/ascii-studio" target="_blank" rel="noopener">github.com/Wyind/ascii-studio &#8599;</a>
-        </article>
+          <a href="https://github.com/Wyind/ascii-studio" target="_blank" rel="noopener">github.com/Wyind/ascii-studio &#8599;</a>
+        </li>
 
-        <article class="card">
-          <div class="card-head">
-            <h3>aether</h3>
-          </div>
-          <p>A TUI text editor and IDE. Lives in the terminal.</p>
-          <a class="text-link" href="https://github.com/Wyind/aether" target="_blank" rel="noopener">github.com/Wyind/aether &#8599;</a>
-        </article>
-      </div>
+        <li>
+          <h3>aether</h3>
+          <p>A TUI text editor. It lives in the terminal.</p>
+          <a href="https://github.com/Wyind/aether" target="_blank" rel="noopener">github.com/Wyind/aether &#8599;</a>
+        </li>
+      </ul>
     </section>
 
     <section id="contact">
       <h2>Contact</h2>
-      <p class="prose">Feel free to reach out regarding Linux tinkering, web browsers, or open-source software.</p>
-      <div class="contact-links">
-        <a class="btn btn-primary" href="https://github.com/Wyind" target="_blank" rel="noopener">GitHub</a>
-        <a class="btn" href="https://x.com/wyindszn" target="_blank" rel="noopener">X / Twitter</a>
-        <a class="btn" href="#top">Back to top</a>
-      </div>
+      <p class="prose">If you want to talk about Linux, browsers, or open source, I'm easy to find.</p>
+      <p class="links">
+        <a href="https://github.com/Wyind" target="_blank" rel="noopener">GitHub &#8599;</a>
+        <a href="https://x.com/wyindszn" target="_blank" rel="noopener">X / Twitter &#8599;</a>
+      </p>
     </section>
 
   </main>
 
   <footer>
-    <div class="wrap footer-inner">
+    <div class="wrap footer">
       <span>&copy; <span id="year">2026</span> wyind</span>
-      <span class="muted">All systems nominal.</span>
+      <span>made by hand, no framework.</span>
     </div>
   </footer>
-
-  <div class="music-dock">
-    <div id="music-panel" class="music-panel hidden" role="region" aria-label="Music player">
-      <div class="panel-head">
-        <span>Now playing</span>
-        <button id="player-close-btn" class="icon-btn" aria-label="Close player">&times;</button>
-      </div>
-
-      <div class="track-info">
-        <div class="track-title" id="player-track-title">&mdash;</div>
-        <div class="track-artist" id="player-track-artist">&mdash;</div>
-      </div>
-
-      <div class="progress" id="player-progress-bar" role="slider" aria-label="Seek" tabindex="0">
-        <div class="progress-fill" id="player-progress-fill"></div>
-      </div>
-      <div class="time-row">
-        <span id="player-current-time">0:00</span>
-        <span id="player-duration">0:00</span>
-      </div>
-
-      <div class="controls">
-        <button id="player-prev-btn" class="ctrl" title="Previous">&#9198;</button>
-        <button id="player-play-btn" class="ctrl play" title="Play / Pause">&#9654;</button>
-        <button id="player-next-btn" class="ctrl" title="Next">&#9197;</button>
-      </div>
-
-      <div class="volume-row">
-        <span>Vol</span>
-        <input type="range" id="player-vol-slider" min="0" max="1" step="0.02" value="0.2" aria-label="Volume" />
-      </div>
-
-      <div class="playlist" id="player-playlist-items"></div>
-    </div>
-
-    <button id="music-toggle-btn" class="music-toggle" title="Toggle music player">
-      <span class="dot"></span>
-      <span id="dock-title-preview">Music</span>
-    </button>
-  </div>
 
   <script src="script.js"></script>
 

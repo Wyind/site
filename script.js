@@ -1,229 +1,174 @@
 (function () {
   'use strict';
 
-  
-  const root = document.documentElement;
-  const themeToggle = document.getElementById('theme-toggle');
+  var yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-  const THEME_ICONS = { light: '☾', dark: '☀' };
+  // retro pipes screensaver, drawn by hand on a canvas behind the page
+  var canvas = document.getElementById('bg');
+  if (!canvas || !canvas.getContext) return;
 
-  function setTheme(theme) {
-    root.setAttribute('data-theme', theme);
-    localStorage.setItem('wyind-theme', theme);
-    if (themeToggle) themeToggle.textContent = THEME_ICONS[theme];
-  }
+  var ctx = canvas.getContext('2d');
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  setTheme(root.getAttribute('data-theme') || 'light');
+  var W = 0;
+  var H = 0;
+  var last = 0;
+  var pipes = [];
 
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    });
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key && e.key.toLowerCase() === 't' && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      const tag = (e.target && e.target.tagName) || '';
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-      setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }
-  });
-
-  
-  const playlist = [
-    { title: "Cold Like December v4", artist: "SailorHearts", file: "assets/coldjustlikedecemberV4 - SailorHearts.mp3" },
-    { title: "Planet Superstars", artist: "Sega Superstars Tennis — Sonic's Mixtapes", file: "assets/Planet Superstars - Sega Superstars Tennis - Sonic's Mixtapes.mp3" },
-    { title: "Lufia 2: Boss Battle Theme", artist: "GSS1-Sirius", file: "assets/Lufia 2： Boss battle theme - GSS1-Sirius.mp3" },
-    { title: "Flying Battery Zone", artist: "SomeBoyWhoMusics", file: "assets/Flying Battery Zone「フライングバッテリーゾーン」[YM2151, YMZ280B] - SomeBoyWhoMusics.mp3" },
-    { title: "Ano ko Secret [8-bit]", artist: "DastardlyNun", file: "assets/E ve - Ano ko Secret [8-bit] Cover - DastardlyNun.mp3" },
-    { title: "Data Select", artist: "SomeBoyWhoMusics", file: "assets/Data Select「データ選択」[YM2151, SEGAPCM] - SomeBoyWhoMusics.mp3" },
-    { title: "Illusion of Control", artist: "usedcvnt", file: "assets/illusion of control - usedcvnt.mp3" },
-    { title: "Serial Experiments", artist: "RoseHipRose", file: "assets/Serial Experiments - RoseHipRose.mp3" },
-    { title: "All the Joy", artist: "Sewerslvt", file: "assets/Sewerslvt - all the joy In life was gone once you left - Sewerslvt.mp3" }
+  var COLORS = [
+    { rgb: '74, 222, 128', a: 0.20 },
+    { rgb: '46, 168, 104', a: 0.25 },
+    { rgb: '152, 200, 172', a: 0.17 },
+    { rgb: '216, 168, 86', a: 0.17 }
   ];
 
-  const audio = new Audio();
-  audio.preload = 'metadata';
+  var DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 
-  const storedVol = parseFloat(localStorage.getItem('wyind-volume'));
-  let currentVolume = Number.isFinite(storedVol) ? storedVol : 0.2;
-  audio.volume = currentVolume;
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function pick(n) { return (Math.random() * n) | 0; }
 
-  let currentIdx = 0;
-  let isPlaying = false;
-  let wantsPlay = false;
-
-  const panel = document.getElementById('music-panel');
-  const toggleBtn = document.getElementById('music-toggle-btn');
-  const closeBtn = document.getElementById('player-close-btn');
-  const playBtn = document.getElementById('player-play-btn');
-  const prevBtn = document.getElementById('player-prev-btn');
-  const nextBtn = document.getElementById('player-next-btn');
-  const titleEl = document.getElementById('player-track-title');
-  const artistEl = document.getElementById('player-track-artist');
-  const dockTitle = document.getElementById('dock-title-preview');
-  const progressBar = document.getElementById('player-progress-bar');
-  const progressFill = document.getElementById('player-progress-fill');
-  const currentTimeEl = document.getElementById('player-current-time');
-  const durationEl = document.getElementById('player-duration');
-  const volSlider = document.getElementById('player-vol-slider');
-  const playlistEl = document.getElementById('player-playlist-items');
-
-  function formatTime(sec) {
-    if (!Number.isFinite(sec) || sec < 0) return '0:00';
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
-    return m + ':' + String(s).padStart(2, '0');
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
   }
 
-  function renderPlaylist() {
-    if (!playlistEl) return;
-    playlistEl.innerHTML = '';
-    playlist.forEach((track, idx) => {
-      const item = document.createElement('div');
-      item.className = 'playlist-item' + (idx === currentIdx ? ' active' : '');
-      item.innerHTML = '<span></span><span></span>';
-      item.children[0].textContent = track.title;
-      item.children[1].textContent = track.artist;
-      item.addEventListener('click', () => {
-        loadTrack(idx);
-        play();
-      });
-      playlistEl.appendChild(item);
-    });
+  function makePipe() {
+    var c = COLORS[pick(COLORS.length)];
+    var sx = rand(40, Math.max(41, W - 40));
+    var sy = rand(40, Math.max(41, H - 40));
+
+    // start heading into the screen, not straight off the nearest edge
+    var d = pick(4);
+    for (var t = 0; t < 8; t++) {
+      var dir = DIRS[d];
+      var toEdge = dir[0] > 0 ? W - sx : dir[0] < 0 ? sx : dir[1] > 0 ? H - sy : sy;
+      if (toEdge > 150) break;
+      d = pick(4);
+    }
+
+    return {
+      sx: sx,
+      sy: sy,
+      x: sx,
+      y: sy,
+      dir: d,
+      pts: [],
+      width: rand(7, 13),
+      color: c.rgb,
+      alpha: c.a,
+      speed: rand(55, 95),
+      target: rand(55, 150),
+      walked: 0,
+      drawn: 0,
+      maxDrawn: rand(900, 2000),
+      age: 0,
+      maxAge: rand(24, 44),
+      dying: 0
+    };
   }
 
-  function loadTrack(idx) {
-    currentIdx = idx;
-    const track = playlist[currentIdx];
-    audio.src = encodeURI(track.file);
-    if (titleEl) titleEl.textContent = track.title;
-    if (artistEl) artistEl.textContent = track.artist;
-    if (dockTitle) dockTitle.textContent = track.title;
-    if (currentTimeEl) currentTimeEl.textContent = '0:00';
-    if (durationEl) durationEl.textContent = '0:00';
-    if (progressFill) progressFill.style.width = '0%';
-    renderPlaylist();
+  function turn(p) {
+    p.pts.push(p.x, p.y);
+    p.walked = 0;
+    p.target = rand(55, 150);
+    // left or right turn only, never a reversal
+    p.dir = (p.dir + (Math.random() < 0.5 ? 1 : 3)) % 4;
   }
 
-  function play() {
-    wantsPlay = true;
-    const p = audio.play();
-    if (p !== undefined) {
-      p.then(() => {
-        isPlaying = true;
-        updatePlayUI();
-      }).catch(() => {
-        isPlaying = false;
-        updatePlayUI();
-      });
-    } else {
-      isPlaying = true;
-      updatePlayUI();
+  function update(dt) {
+    for (var i = pipes.length - 1; i >= 0; i--) {
+      var p = pipes[i];
+      p.age += dt;
+
+      var step = p.speed * dt;
+      p.x += DIRS[p.dir][0] * step;
+      p.y += DIRS[p.dir][1] * step;
+      p.walked += step;
+      p.drawn += step;
+      if (p.walked >= p.target) turn(p);
+
+      if (p.dying) {
+        p.dying += dt / 1.4;
+        if (p.dying >= 1) {
+          pipes.splice(i, 1);
+          continue;
+        }
+      } else if (
+        p.x < -40 || p.x > W + 40 || p.y < -40 || p.y > H + 40 ||
+        p.drawn > p.maxDrawn || p.age > p.maxAge
+      ) {
+        p.dying = 0.0001;
+      }
+    }
+
+    var want = W >= 1500 ? 4 : 3;
+    var living = 0;
+    for (var j = 0; j < pipes.length; j++) if (!pipes[j].dying) living++;
+    for (var k = living; k < want; k++) pipes.push(makePipe());
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    for (var i = 0; i < pipes.length; i++) {
+      var p = pipes[i];
+      var fadeIn = Math.min(1, p.age / 0.9);
+      var fadeOut = p.dying ? Math.max(0, 1 - p.dying) : 1;
+      var a = p.alpha * fadeIn * fadeOut;
+      if (a < 0.01) continue;
+
+      var paint = 'rgba(' + p.color + ',' + a.toFixed(3) + ')';
+      ctx.strokeStyle = paint;
+      ctx.lineWidth = p.width;
+
+      ctx.beginPath();
+      ctx.moveTo(p.sx, p.sy);
+      for (var k = 0; k < p.pts.length; k += 2) ctx.lineTo(p.pts[k], p.pts[k + 1]);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+
+      // fittings at the start and at every elbow
+      var r = p.width / 2 + 2.5;
+      ctx.fillStyle = 'rgba(' + p.color + ',' + Math.min(0.4, a * 1.3).toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(p.sx, p.sy, r, 0, Math.PI * 2);
+      for (var j = 0; j < p.pts.length; j += 2) {
+        ctx.moveTo(p.pts[j] + r, p.pts[j + 1]);
+        ctx.arc(p.pts[j], p.pts[j + 1], r, 0, Math.PI * 2);
+      }
+      ctx.fill();
     }
   }
 
-  function pause() {
-    wantsPlay = false;
-    audio.pause();
-    isPlaying = false;
-    updatePlayUI();
+  function frame(t) {
+    var dt = last ? Math.min((t - last) / 1000, 0.05) : 0;
+    last = t;
+    update(dt);
+    draw();
+    requestAnimationFrame(frame);
   }
 
-  function toggle() {
-    if (isPlaying) pause();
-    else play();
-  }
+  resize();
 
-  function updatePlayUI() {
-    if (playBtn) playBtn.innerHTML = isPlaying ? '&#10074;&#10074;' : '&#9654;';
-    if (toggleBtn) toggleBtn.classList.toggle('playing', isPlaying);
-  }
-
-  function next() {
-    loadTrack((currentIdx + 1) % playlist.length);
-    if (wantsPlay) play();
-  }
-
-  function prev() {
-    if (audio.currentTime > 3) {
-      audio.currentTime = 0;
-      return;
-    }
-    loadTrack((currentIdx - 1 + playlist.length) % playlist.length);
-    if (wantsPlay) play();
-  }
-
-  if (playBtn) playBtn.addEventListener('click', toggle);
-  if (nextBtn) nextBtn.addEventListener('click', next);
-  if (prevBtn) prevBtn.addEventListener('click', prev);
-
-  audio.addEventListener('timeupdate', () => {
-    if (Number.isFinite(audio.duration) && audio.duration > 0) {
-      progressFill.style.width = (audio.currentTime / audio.duration) * 100 + '%';
-      currentTimeEl.textContent = formatTime(audio.currentTime);
-    }
+  window.addEventListener('resize', function () {
+    resize();
+    if (reduced) draw();
   });
 
-  audio.addEventListener('loadedmetadata', () => {
-    durationEl.textContent = formatTime(audio.duration);
-  });
-
-  audio.addEventListener('ended', next);
-
-  if (progressBar) {
-    progressBar.addEventListener('click', (e) => {
-      if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
-      const rect = progressBar.getBoundingClientRect();
-      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-    });
+  if (reduced) {
+    // draw a finished composition once, then leave it alone
+    for (var s = 0; s < 24; s++) update(0.5);
+    draw();
+  } else {
+    requestAnimationFrame(frame);
   }
-
-  if (volSlider) {
-    volSlider.value = currentVolume;
-    volSlider.addEventListener('input', (e) => {
-      currentVolume = parseFloat(e.target.value);
-      audio.volume = currentVolume;
-      localStorage.setItem('wyind-volume', String(currentVolume));
-    });
-  }
-
-  if (toggleBtn && panel) {
-    toggleBtn.addEventListener('click', () => panel.classList.toggle('hidden'));
-  }
-
-  if (closeBtn && panel) {
-    closeBtn.addEventListener('click', () => panel.classList.add('hidden'));
-  }
-
-  loadTrack(0);
-
-  
-  const gate = document.getElementById('gate');
-  const enterBtn = document.getElementById('enter-btn');
-  let entered = false;
-
-  function enterSite() {
-    if (!gate || entered) return;
-    entered = true;
-    gate.classList.add('leaving');
-    document.body.classList.remove('gate-open');
-    play();
-    window.setTimeout(() => gate.classList.add('gone'), 550);
-  }
-
-  if (gate) gate.addEventListener('click', enterSite);
-  if (enterBtn) enterBtn.addEventListener('click', (e) => { e.stopPropagation(); enterSite(); });
-
-  document.addEventListener('keydown', (e) => {
-    if (gate && gate.classList.contains('gone')) return;
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
-      e.preventDefault();
-      enterSite();
-    }
-  });
-
-  
-  const yearEl = document.getElementById('year');
-  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 })();
