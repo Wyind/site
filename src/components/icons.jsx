@@ -26,13 +26,13 @@ export function ComputerIcon({ small = false }) {
 export function StartGlyph() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges" aria-hidden="true">
-      <rect x="7" y="1" width="2" height="14" fill="#a99fdb" />
-      <rect x="1" y="7" width="14" height="2" fill="#a99fdb" />
-      <rect x="3" y="3" width="2" height="2" fill="#6a619b" />
-      <rect x="11" y="3" width="2" height="2" fill="#6a619b" />
-      <rect x="3" y="11" width="2" height="2" fill="#6a619b" />
-      <rect x="11" y="11" width="2" height="2" fill="#6a619b" />
-      <rect x="6" y="6" width="4" height="4" fill="#dcd9ea" />
+      <rect x="7" y="1" width="2" height="14" fill="#f1bd54" />
+      <rect x="1" y="7" width="14" height="2" fill="#f1bd54" />
+      <rect x="3" y="3" width="2" height="2" fill="#3568d4" />
+      <rect x="11" y="3" width="2" height="2" fill="#3568d4" />
+      <rect x="3" y="11" width="2" height="2" fill="#3568d4" />
+      <rect x="11" y="11" width="2" height="2" fill="#3568d4" />
+      <rect x="6" y="6" width="4" height="4" fill="#f8cc80" />
     </svg>
   );
 }

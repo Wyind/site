@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { makeStars } from './stars.js';
 import { ComputerIcon, SettingsIcon, SpeakerIcon, SpeakerOffIcon } from './components/icons.jsx';
 import Taskbar from './components/Taskbar.jsx';
 
+const WALLPAPER = 'url("/sitebg.png")';
+
 const DEFAULT_SETTINGS = {
   muted: false,
-  stars: true,
+  wallpaper: true,
   glitch: true,
   openOnStartup: false,
   desktopSettingsIcon: true,
@@ -24,12 +25,14 @@ export default function App() {
     try {
       const saved = localStorage.getItem('wyind-settings');
       const base = saved ? JSON.parse(saved) : {};
+      const { stars: legacyStars, ...rest } = base;
       const legacyMuted = localStorage.getItem('wyind-muted');
       return {
         ...DEFAULT_SETTINGS,
-        ...base,
-        openOnStartup: base.openOnStartup ?? false,
-        muted: base.muted !== undefined ? base.muted : legacyMuted === '1',
+        ...rest,
+        openOnStartup: rest.openOnStartup ?? false,
+        muted: rest.muted !== undefined ? rest.muted : legacyMuted === '1',
+        wallpaper: rest.wallpaper ?? legacyStars ?? true,
       };
     } catch {
       return DEFAULT_SETTINGS;
@@ -74,12 +77,8 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (settings.stars) {
-      document.documentElement.style.backgroundImage = 'url("' + makeStars() + '")';
-    } else {
-      document.documentElement.style.backgroundImage = 'none';
-    }
-  }, [settings.stars]);
+    document.documentElement.style.backgroundImage = settings.wallpaper ? WALLPAPER : 'none';
+  }, [settings.wallpaper]);
 
   useEffect(() => {
     function onKey(e) {
@@ -322,9 +321,9 @@ export default function App() {
     setMaximized((v) => !v);
   }
 
-  function refreshStars() {
-    if (settings.stars) {
-      document.documentElement.style.backgroundImage = 'url("' + makeStars() + '")';
+  function refreshWallpaper() {
+    if (settings.wallpaper) {
+      document.documentElement.style.backgroundImage = WALLPAPER;
     }
   }
 
@@ -418,7 +417,7 @@ export default function App() {
             width="32"
             height="32"
             alt=""
-            style={{ border: '1px solid var(--hl-1)' }}
+            style={{ border: '1px solid var(--accent)' }}
           />
           <span className="desktop-icon-label">wyind</span>
         </button>
@@ -442,7 +441,7 @@ export default function App() {
             role="menuitem"
             onClick={() => {
               setCtxMenu(null);
-              refreshStars();
+              refreshWallpaper();
             }}
           >
             Refresh
@@ -664,11 +663,11 @@ export default function App() {
               <div className="field-row">
                 <input
                   type="checkbox"
-                  id="setting-stars"
-                  checked={settings.stars}
-                  onChange={(e) => updateSetting('stars', e.target.checked)}
+                  id="setting-wallpaper"
+                  checked={settings.wallpaper}
+                  onChange={(e) => updateSetting('wallpaper', e.target.checked)}
                 />
-                <label htmlFor="setting-stars">Starfield wallpaper</label>
+                <label htmlFor="setting-wallpaper">Sky wallpaper</label>
               </div>
               <div className="field-row">
                 <input

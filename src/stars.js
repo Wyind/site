@@ -1,4 +1,4 @@
-const SHADES = ['#1a1734', '#201c3c', '#241f44', '#2c2850', '#322c58', '#3a3560', '#443e6e', '#4a4470'];
+const SHADES = ['#101f42', '#14254e', '#1a3268', '#213a73', '#23407f', '#2b4b95', '#3568d4', '#6d90d8'];
 
 export function makeStars() {
   let rects = '';

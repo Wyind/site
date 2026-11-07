@@ -7,32 +7,36 @@
 }
 
 :root {
-  --bg: #0a0912;
-  --face: #262338;
-  --face-2: #2f2b45;
-  --face-3: #38334f;
-  --hl-1: #565077;
-  --hl-2: #3f3a5c;
-  --sh-1: #0a0812;
-  --sh-2: #161226;
-  --line: #141124;
-  --text: #dcd9ea;
-  --muted: #9d97bb;
-  --link: #b9b4dc;
-  --link-h: #ffffff;
-  --accent: #a99fdb;
-  --title-1: #262145;
-  --title-2: #6a619b;
-  --menu-hl: #4d4678;
+  --bg: #060c1a;
+  --face: #1b2c5c;
+  --face-2: #233a76;
+  --face-3: #2c4a91;
+  --hl-1: #6d90d8;
+  --hl-2: #3d64ae;
+  --sh-1: #050a15;
+  --sh-2: #101c3b;
+  --line: #24396d;
+  --text: #eaf0fb;
+  --muted: #a7b7d8;
+  --link: #f4c76b;
+  --link-h: #ffe3a3;
+  --accent: #f1bd54;
+  --cream: #f8cc80;
+  --sky: #2e61cc;
+  --title-1: #1a2c63;
+  --title-2: #3568d4;
+  --menu-hl: var(--sky);
   --font: "Pixelated MS Sans Serif", Tahoma, "Segoe UI", Arial, sans-serif;
 }
 
 html {
   background-color: var(--bg);
   overflow: hidden;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' shape-rendering='crispEdges'%3E%3Crect x='4' y='6' width='1' height='1' fill='%232c2850'/%3E%3Crect x='13' y='2' width='1' height='1' fill='%23241f44'/%3E%3Crect x='22' y='10' width='1' height='1' fill='%23322c58'/%3E%3Crect x='7' y='17' width='1' height='1' fill='%23201c3c'/%3E%3Crect x='18' y='23' width='1' height='1' fill='%232e2952'/%3E%3Crect x='27' y='19' width='1' height='1' fill='%2326224a'/%3E%3Crect x='25' y='29' width='1' height='1' fill='%231e1a38'/%3E%3Crect x='10' y='26' width='1' height='1' fill='%2335305c'/%3E%3Crect x='30' y='5' width='1' height='1' fill='%23221e40'/%3E%3Crect x='15' y='13' width='1' height='1' fill='%23443e6e'/%3E%3Crect x='2' y='21' width='2' height='2' fill='%234a4470'/%3E%3Crect x='20' y='30' width='1' height='1' fill='%231a1734'/%3E%3Crect x='6' y='11' width='1' height='1' fill='%231a1734'/%3E%3Crect x='29' y='15' width='1' height='1' fill='%232a2650'/%3E%3Crect x='12' y='20' width='1' height='1' fill='%231e1a3c'/%3E%3Crect x='17' y='8' width='1' height='1' fill='%231c1936'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 32px 32px;
+  background-image: url("/sitebg.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   scroll-behavior: smooth;
 }
 
@@ -44,6 +48,11 @@ body {
   font-size: 13px;
   line-height: 1.75;
   -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: #071a4d;
 }
 
 a {
@@ -155,7 +164,7 @@ h2 {
   width: 72px;
   height: 72px;
   object-fit: cover;
-  border: 1px solid var(--hl-1);
+  border: 1px solid var(--accent);
   margin-bottom: 18px;
 }
 
@@ -163,7 +172,7 @@ h2 {
   font-size: clamp(26px, 6vw, 34px);
   font-weight: 700;
   line-height: 1.15;
-  color: #fff;
+  color: var(--cream);
 }
 
 .tagline {
@@ -243,7 +252,7 @@ h2 {
   font-family: var(--font);
   font-size: 13px;
   font-weight: 700;
-  color: #fff;
+  color: var(--cream);
   margin-bottom: 2px;
 }
 
@@ -260,8 +269,8 @@ h2 {
 }
 
 .site-window .status-bar-field {
-  background: #1e1b2d;
-  box-shadow: inset -1px -1px #4a4566, inset 1px 1px var(--sh-1);
+  background: #12224a;
+  box-shadow: inset -1px -1px var(--hl-2), inset 1px 1px var(--sh-1);
 }
 
 @media (max-width: 560px) {
@@ -368,7 +377,7 @@ h2 {
 }
 
 .desktop-icon:focus {
-  outline: 1px dotted #dcd9ea;
+  outline: 1px dotted var(--text);
   outline-offset: -2px;
 }
 
@@ -633,8 +642,8 @@ h2 {
   justify-content: center;
   gap: 26px;
   padding: 24px;
-  background: #000;
-  color: #ff9c00;
+  background: var(--bg);
+  color: var(--accent);
   font-family: var(--font);
   font-size: clamp(15px, 3.6vw, 24px);
   text-align: center;
@@ -653,7 +662,7 @@ h2 {
   border: none;
   border-radius: 0;
   box-shadow: none;
-  color: #ff9c00;
+  color: var(--accent);
   text-shadow: none;
   font-family: var(--font);
   font-size: clamp(13px, 2.6vw, 17px);
@@ -664,12 +673,12 @@ h2 {
 
 .shutdown-actions button:hover,
 .shutdown-actions button:focus {
-  text-decoration-color: #ff9c00;
+  text-decoration-color: var(--accent);
   outline: none;
 }
 
 .shutdown-actions button:focus {
-  outline: 1px dotted #ff9c00;
+  outline: 1px dotted var(--accent);
   outline-offset: 3px;
 }
 
@@ -763,7 +772,7 @@ h2 {
 .site-window.is-glitch .title-bar-text,
 .site-window.is-glitch .window-body,
 .site-window.is-glitch .status-bar {
-  text-shadow: 2px 0 rgba(255, 0, 200, 0.75), -2px 0 rgba(0, 255, 255, 0.75);
+  text-shadow: 2px 0 rgba(241, 189, 84, 0.75), -2px 0 rgba(86, 140, 230, 0.75);
   animation: glitch-text 0.16s steps(2) infinite;
 }
 
@@ -945,7 +954,7 @@ h2 {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background-color: #0000aa;
+  background-color: #071a4d;
   color: #ffffff;
   font-family: "Courier New", Courier, monospace;
   font-size: clamp(12px, 2.2vw, 15px);
@@ -975,8 +984,8 @@ h2 {
 
 .bsod-header {
   display: inline-block;
-  background-color: #a8a8a8;
-  color: #0000aa;
+  background-color: var(--accent);
+  color: #071a4d;
   font-weight: bold;
   padding: 2px 14px;
   letter-spacing: 2px;
